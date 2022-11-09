@@ -276,7 +276,7 @@ export default {
       this.date = this.$store.state.date;
       this.into();
     },
-    onItemClick(node, data) {
+    onItemClick(node) {
       this.$refs.myCascadeRef.dropDownVisible = false;
       // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
       this.value = findAllParent(node);

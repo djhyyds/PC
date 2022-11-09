@@ -1,16 +1,17 @@
 <template>
-  <div id="main" style="width:100%;height:100%"></div>
+  <div id="main" style="width: 100%; height: 100%"></div>
 </template>
 
 <script>
-import * as echarts from "echarts";
-import _ from "lodash";
+import * as echarts from "echarts"
+import _ from "lodash"
 export default {
   methods: {
-    show() {
-      var chartDom = document.getElementById("main");
-      var myChart = echarts.init(chartDom, "dark");
-      var option;
+    show () {
+      var chartDom = document.getElementById("main")
+      var myChart = echarts.init(chartDom, "dark")
+      var option
+      let open = true
       var data = {
         nodes: [
           {
@@ -514,7 +515,166 @@ export default {
             value: 378
           }
         ]
-      };
+      }
+      const links = data.links
+      const nodes = data.nodes
+
+      function tt (links, noods) {
+        links.forEach((item) => {
+          links.forEach((item2) => {
+            if (item.target === item2.source) {
+              if (item.next) {
+                item.next.push(item2)
+              } else {
+                item.next = [item2]
+              }
+            }
+          })
+          links.forEach((item2) => {
+            if (item.source === item2.target) {
+              if (item.prev) {
+                item.prev.push(item2)
+              } else {
+                item.prev = [item2]
+              }
+            }
+          })
+          let ary = []
+          for (let i = 0; i < noods.length && ary.length < 2; i++) {
+            if (noods[i].name === item.target || noods[i].name === item.source)
+              ary.push(nodes[i])
+          }
+
+          item.node = ary
+        })
+      }
+      function deep (obj, i = [0, true]) {
+        const [num, bool] = i
+
+        if (obj.depth) {
+          return [obj.depth, false]
+        }
+
+        if (obj.prev) {
+          const [num2, bool2] = deep(obj.prev[0], [num + 1, bool])
+          if (bool2) {
+            obj.depth = num2 - num
+            return [num2, true]
+          } else {
+            obj.depth = num2 + 1
+            return [obj.depth, false]
+          }
+        }
+
+        obj.depth = 1
+        return [num + obj.depth, true]
+      }
+
+      tt(links, nodes)
+
+      links.forEach((item) => {
+        deep(item)
+      })
+      const names = []
+      const newLinkkkk = []
+      const nodessss = []
+      links.forEach((item) => {
+        if (item.additions && !names.includes(item.source)) {
+          const link = {
+            source: item.source,
+            target: ` ${item.source} `,
+            value: item.additions.paths,
+            lineStyle: {
+              color: '#fbdcd9',
+              opacity: 0.5
+            }
+          }
+          const node = {
+            name: ` ${item.source} `,
+            depth: item.depth,
+            label: {
+              show: false
+            },
+            itemStyle: {
+              color: '#fbdcd9',
+              opacity: 0.5
+            }
+          }
+          newLinkkkk.push(link)
+          nodessss.push(node)
+          names.push(item.source)
+          item.copy = link
+          item.node.copy = node
+        }
+      })
+
+
+      const ll = JSON.parse(JSON.stringify(newLinkkkk))
+      const no = JSON.parse(JSON.stringify(nodessss))
+
+      let opacity = false
+
+      function limkMap (links) {
+        return links.map((item) => {
+          const obj = {
+            source: item.source,
+            target: item.target,
+            value: item.value,
+            additions: item.additions
+          }
+          if (!item.bool && opacity) {
+
+            obj.lineStyle = {
+              opacity: 0
+            }
+
+          }
+
+          if (item.copy) {
+
+
+            if (!item.bool && opacity) {
+
+              item.copy.lineStyle.opacity = 0
+              item.node.copy.itemStyle.opacity = 0
+
+            } else {
+              item.copy.lineStyle.opacity = 0.5
+              item.node.copy.itemStyle.opacity = 1
+            }
+
+          }
+
+
+          delete item.bool
+          return obj
+        })
+      }
+      function nodeMap () {
+        return nodes.map((item) => {
+          console.log(item, 'item')
+          const obj = {
+            ...item
+          }
+          if (!item.bool && opacity) {
+            obj.itemStyle = {
+              opacity: 0
+            }
+            obj.label = {
+              show: false
+            }
+          }
+
+          delete item.bool
+          return obj
+        })
+      }
+      const newLinks = limkMap(links)
+
+      const newNoods = nodeMap()
+
+
+
       option = {
         backgroundColor: "#eee",
         title: {
@@ -528,8 +688,8 @@ export default {
             top: 20.0,
             right: 150.0,
             bottom: 25.0,
-            data: data.nodes,
-            links: data.links,
+            data: [...newNoods, ...nodessss],
+            links: [...newLinks, ...newLinkkkk],
             lineStyle: {
               color: "source",
               curveness: 0.4
@@ -552,97 +712,83 @@ export default {
         tooltip: {
           trigger: "item"
         }
-      };
-      option && myChart.setOption(option);
-      // let isSelected = false,
-      //   cacheName = "";
-      // myChart.on("click", e => {
-      //   // console.log(e,drawData)
-      //   if (e.data.source) return;
-      //   let { name } = e;
-      //   let { links, nodes } = _.cloneDeep(data);
-      //   let options = myChart.getOption();
-      //   if (cacheName !== name) {
-      //     isSelected = false;
-      //   }
-      //   cacheName = name;
-      //   if (!isSelected) {
-      //     let selectedNodes = [],
-      //       selectedLinks = [];
-      //     selectedNodes = links
-      //       .filter(item => {
-      //         return item.source === name || item.target === name;
-      //       })
-      //       .map(item => {
-      //         return [
-      //           {
-      //             name: item.source,
-      //             itemStyle: {
-      //               // color: '#1DFA7C',
-      //               opacity: 1
-      //             },
-      //             label: {
-      //               fontSize: 12
-      //             }
-      //           },
-      //           {
-      //             name: item.target,
-      //             itemStyle: {
-      //               // color: '#1DFA7C',
-      //               opacity: 1
-      //             },
-      //             label: {
-      //               fontSize: 12
-      //             }
-      //           }
-      //         ];
-      //       })
-      //       .flat();
-      //     nodes = _.unionBy(selectedNodes, nodes, "name").map(item => {
-      //       if (!item.itemStyle) {
-      //         item.itemStyle = {
-      //           opacity: 0.3
-      //         };
-      //         item.label = {
-      //           show: false
-      //         };
-      //       }
-      //       return item;
-      //     });
-      //     selectedLinks = links.map(item => {
-      //       if (item.source === name || item.target === name) {
-      //         return {
-      //           ...item,
-      //           lineStyle: {
-      //             // color: '#FFD700',
-      //             opacity: 0.8
-      //           }
-      //         };
-      //       } else {
-      //         return {
-      //           ...item,
-      //           lineStyle: {
-      //             color: "transparent",
-      //             opacity: 0.3
-      //           }
-      //         };
-      //       }
-      //     });
-      //     options.series[0].data = nodes;
-      //     options.series[0].links = selectedLinks;
-      //     isSelected = true;
-      //   } else {
-      //     options.series[0].data = nodes;
-      //     options.series[0].links = links;
-      //     isSelected = false;
-      //   }
-      //   myChart.setOption(options);
-      // });
+      }
+      option && myChart.setOption(option)
+      myChart.on('click', (e) => {
+        if (open) {
+          open = !open
+          const name = e.data.name || e.data.target
+          opacity = true
+          let obj = links.find((item) => item.source === name)
+
+          // console.log(obj);
+
+          if (!obj) {
+            const prev = links.filter((item) => item.target === name)
+            obj = {
+              prev
+            }
+          }
+
+          if (!obj.prev) {
+            const prev = links.filter((item) => item.source === name)
+            obj = {
+              root: true,
+              prev
+            }
+          }
+
+          prev(obj.prev)
+          next(obj.prev)
+
+          // console.log(links);
+
+          // console.log(links, nodes, 'qqq', obj);
+          const newLiks2 = limkMap(links, 1)
+
+          // console.log(newLinkkkk, newLiks2, 'qqq');
+          const newNood222s = nodeMap()
+          const options = myChart.getOption()
+          options.series[0].data = [...newNood222s, ...nodessss]
+          options.series[0].links = [...newLinkkkk, ...newLiks2]
+          myChart.setOption(options)
+
+        } else {
+          open = !open
+          const options = myChart.getOption()
+          opacity = false
+          options.series[0].data = [...newNoods, ...no]
+          options.series[0].links = [...newLinks, ...ll]
+          myChart.setOption(options)
+        }
+      })
+
+      function prev (ary) {
+        ary &&
+          ary.forEach((item) => {
+            item.bool = true
+            item.node.forEach((item) => {
+              item.bool = true
+            })
+            prev(item.prev)
+          })
+      }
+
+      function next (ary) {
+        ary &&
+          ary.forEach((item) => {
+            item.bool = true
+            item.node.forEach((item) => {
+              item.bool = true
+            })
+            next(item.next)
+          })
+      }
     }
   },
-  mounted() {
-    this.show();
-    console.log(_);
+  mounted () {
+    this.show()
+    console.log(_)
   }
 };
 </script>
