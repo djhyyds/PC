@@ -2,6 +2,14 @@
   <div class="risk">
     <h3>风险维度</h3>
     <hr />
+    <div class="input">
+      <div>
+        动态时间：
+        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
+        <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
+      </div>
+    </div>
     <div class="action">
       <div class="code">
         <div>
@@ -9,7 +17,7 @@
           <span>{{result['司法风险']}}</span>
           <div @click="filter('司法风险')">查看详情</div>
         </div>
-        <div id="main" style="width:150px;height:150px"></div>
+        <div id="main" style="width:150px;height:150px" ref="main"></div>
       </div>
       <div class="code">
         <div>
@@ -17,7 +25,7 @@
           <span>{{result['工商风险']}}</span>
           <div @click="filter('工商风险')">查看详情</div>
         </div>
-        <div id="main1" style="width:150px;height:150px"></div>
+        <div id="main1" style="width:150px;height:150px" ref="main1"></div>
       </div>
       <div class="code">
         <div>
@@ -25,7 +33,7 @@
           <span>{{result['经营风险']}}</span>
           <div @click="filter('经营风险')">查看详情</div>
         </div>
-        <div id="main2" style="width:150px;height:150px"></div>
+        <div id="main2" style="width:150px;height:150px" ref="main2"></div>
       </div>
       <div class="code">
         <div>
@@ -33,7 +41,7 @@
           <span>{{result['经营状况']}}</span>
           <div @click="filter('经营状况')">查看详情</div>
         </div>
-        <div id="main3" style="width:150px;height:150px"></div>
+        <div id="main3" style="width:150px;height:150px" ref="main3"></div>
       </div>
     </div>
     <div class="code2">
@@ -47,6 +55,11 @@ import * as echarts from "echarts";
 export default {
   data() {
     return {
+      date: this.$store.state.date,
+      myChart: "",
+      myChart1: "",
+      myChart2: "",
+      myChart3: "",
       obj: {
         法院公告: "司法风险",
         失信被执行人: "司法风险",
@@ -109,11 +122,34 @@ export default {
         公告研报: "经营状况",
         资产交易: "经营状况"
       },
-      res: this.$store.state.res,
-      result: {}
+      res2: this.$store.state.res,
+      res: "",
+      result: { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 }
     };
   },
   methods: {
+    into() {
+      this.res = this.res2.filter(
+        item => 1666972800 - item.时间戳 <= this.date
+      );
+      this.res.forEach(item => {
+        if (this.result[item["风险维度"]]) {
+          this.result[item["风险维度"]]++;
+        } else {
+          this.result[item["风险维度"]] = 1;
+        }
+      });
+    },
+    DateTime(a) {
+      this.result = { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 };
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
+      this.show();
+      this.show1();
+      this.show2();
+      this.show3();
+    },
     filter(b) {
       this.$router.push({
         name: "details",
@@ -124,8 +160,6 @@ export default {
       });
     },
     show() {
-      let chartDom = document.getElementById("main");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -177,11 +211,9 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart.setOption(option);
     },
     show1() {
-      let chartDom = document.getElementById("main1");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -234,11 +266,9 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart1.setOption(option);
     },
     show2() {
-      let chartDom = document.getElementById("main2");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -290,11 +320,9 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart2.setOption(option);
     },
     show3() {
-      let chartDom = document.getElementById("main3");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -346,7 +374,7 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart3.setOption(option);
     },
     show4() {
       var chartDom = document.getElementById("main4");
@@ -377,14 +405,22 @@ export default {
         { name: "软件著作权", value: 21 },
         { name: "送达公告", value: 2 }
       ];
+      data = data.sort((a, b) => {
+        let value1 = a["value"],
+          value2 = b["value"];
+        return value2 - value1;
+      });
       option = {
         series: {
           type: "pie",
           radius: [80, 160],
+          emphasis: {
+            focus: "self"
+          },
           left: "center",
           width: "700px",
           label: {
-            formatter: "{name|{b}}\n",
+            formatter: "{name|{b} {d}%} \n",
             minMargin: 1,
             edgeDistance: 1,
             lineHeight: 1,
@@ -402,7 +438,14 @@ export default {
     }
   },
   mounted() {
-    console.log(this.result);
+    let main1 = this.$refs.main1;
+    this.myChart1 = echarts.init(main1);
+    let main2 = this.$refs.main2;
+    this.myChart2 = echarts.init(main2);
+    let main3 = this.$refs.main3;
+    this.myChart3 = echarts.init(main3);
+    let main = this.$refs.main;
+    this.myChart = echarts.init(main);
     this.show();
     this.show1();
     this.show2();
@@ -410,18 +453,24 @@ export default {
     this.show4();
   },
   created() {
-    this.res.forEach(item => {
-      if (this.result[item["风险维度"]]) {
-        this.result[item["风险维度"]]++;
-      } else {
-        this.result[item["风险维度"]] = 1;
-      }
-    });
+    this.into();
   }
 };
 </script>
 
 <style scoped lang='less'>
+.input {
+  display: flex;
+  justify-content: end;
+  margin: 20px;
+  .active {
+    color: aqua;
+  }
+  span {
+    cursor: pointer;
+    margin-left: 10px;
+  }
+}
 .action {
   margin-top: 30px;
   display: flex;
@@ -436,6 +485,7 @@ export default {
     align-items: center;
     div {
       p {
+        font-size: 24px;
         font-weight: 100;
         margin: 0;
       }

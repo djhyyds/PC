@@ -22,7 +22,6 @@
           <el-cascader
             v-model="value"
             :options="options"
-            clearable
             :show-all-levels="false"
             :props="{ checkStrictly: true, expandTrigger: 'hover' }"
             popper-class="myCascade"
@@ -38,14 +37,16 @@
           </el-cascader>
         </el-form-item>
         <el-form-item>
-          <el-input placeholder="请输入公司名称" v-model="input" @change="onSearch" clearable></el-input>
+          <el-select v-model="search" filterable clearable @change="onSearch" placeholder="请输入公司名称">
+            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div>
         动态时间：
-        <span>今天</span>
-        <span>近7天</span>
-        <span>近30天</span>
+        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
+        <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
       </div>
     </div>
     <div class="content">
@@ -56,7 +57,7 @@
       <el-table :data="tableData" border style="width: 100%;margin-top:20px" height="590px">
         <el-table-column fixed label="监控主体" min-width="200" header-align="center">
           <template slot-scope="scope">
-            <el-link type="primary" :underline="false">{{ scope.row['公司']}}</el-link>
+            <el-link type="primary" :underline="false">{{ scope.row['公司']}}</el-link><br>
             <el-link type="warning" :underline="false">历史监控动态</el-link>
           </template>
         </el-table-column>
@@ -120,12 +121,13 @@ function findAllParent(node) {
     return [node.data.value];
   }
 }
-function filter(a, b, c, data) {
-  console.log(data, a);
+function filter(a, b, c, d, e, data) {
   return data.filter(item => {
     let bool = true;
     let bool2 = true;
     let bool3 = true;
+    let bool4 = true;
+    let bool5 = true;
     if (a) {
       bool = item.等级 === a;
     }
@@ -135,12 +137,21 @@ function filter(a, b, c, data) {
     if (c) {
       bool3 = item.风险维度 === c;
     }
-    return bool && bool2 && bool3;
+    if (d) {
+      bool4 = item.公司 === d;
+    }
+    if (e) {
+      bool5 = 1666972800 - item.时间戳 <= e;
+    }
+    return bool && bool2 && bool3 && bool4 && bool5;
   });
 }
 export default {
   data() {
     return {
+      date: this.$store.state.date,
+      setOption: [],
+      search: "",
       input: "",
       formInline: {
         region: ""
@@ -260,12 +271,16 @@ export default {
     };
   },
   methods: {
+    DateTime(a) {
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
+    },
     onItemClick(node, data) {
-      console.log(node, data);
       this.$refs.myCascadeRef.dropDownVisible = false;
       // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
       this.value = findAllParent(node);
-      console.log(this.value);
+
       // let res2 = this.res;
       // if (node.level == 1) {
       //   if (this.value[0] == "total") {
@@ -317,6 +332,7 @@ export default {
       //     item => item[this.result] == this.risk
       //   );
       // }
+      this.setOption = [];
       this.risk = this.formInline.region;
       let b, c;
       if (Array.isArray(this.value)) {
@@ -329,41 +345,45 @@ export default {
         c = this.value;
       }
 
-      this.tableCopeTableList = filter(this.risk, b, c, this.res);
+      this.tableCopeTableList = filter(
+        this.risk,
+        b,
+        c,
+        this.search,
+        this.date,
+        this.res
+      );
       this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
-      console.log(this.tableCopeTableList);
+      this.tableCopeTableList.forEach(item => {
+        if (this.setOption.indexOf(item.公司) == -1) {
+          this.setOption.push(item.公司);
+        }
+      });
+
     },
-    fuzzySearch(list, search) {
-      let data = [];
-      if (list.length != 0 && search) {
-        let str = `\S*${search}\S*`;
-        let reg = new RegExp(str);
-        list.map(item => {
-          if (reg.test(item["公司"])) {
-            data.push(item);
-          }
-        });
-      }
-      this.tableCopeTableList = data;
-      this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
-    },
-    onSearch(val) {
-      if (!val) {
-        this.tableCopeTableList = this.res;
-        this.tableData = this.currentChangePage(
-          this.pageSize,
-          this.currentPage
-        );
-        return;
-      }
-      this.fuzzySearch(this.res, val);
+    // fuzzySearch(list, search) {
+    //   let data = [];
+    //   if (list.length != 0 && search) {
+    //     let str = `\S*${search}\S*`;
+    //     let reg = new RegExp(str);
+    //     list.map(item => {
+    //       if (reg.test(item["公司"])) {
+    //         data.push(item);
+    //       }
+    //     });
+    //   }
+    //   this.tableCopeTableList = data;
+    //   this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
+    // },
+    onSearch() {
+      this.into();
     }
   },
   created() {
     this.res = this.$store.state.res;
     this.formInline.region = this.$route.params.a;
     this.value = this.$route.params.b;
-    console.log(this.value, "value");
+
     // this.result = this.$route.params.result;
     this.into();
   },
@@ -385,7 +405,11 @@ export default {
     justify-content: space-between;
 
     div {
+      .active {
+        color: aqua;
+      }
       span {
+        cursor: pointer;
         margin-left: 10px;
       }
     }

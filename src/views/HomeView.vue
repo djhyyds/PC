@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <el-container style="border: 1px solid #eee;height:100%">
-      <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+      <el-aside width="12%" style="background-color: rgb(238, 241, 246)">
         <el-menu default-active="1">
           <el-submenu index="0">
             <template slot="title">
@@ -29,7 +29,7 @@ export default {};
 
 <style>
 .home {
-  width: 70%;
+  width: 90%;
   height: 900px;
   margin: 0 auto;
 }

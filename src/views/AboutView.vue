@@ -2,14 +2,22 @@
   <div class="about">
     <h3>风险级别</h3>
     <hr />
+    <div class="input">
+      <div>
+        动态时间：
+        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
+        <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
+      </div>
+    </div>
     <div class="action">
       <div class="code">
         <div>
           <p>高风险</p>
-          <span>1</span>
+          <span>{{result['高风险']}}</span>
           <div @click="filter('高风险')">查看详情</div>
         </div>
-        <div id="main" style="width:150px;height:150px"></div>
+        <div id="main" style="width:150px;height:150px" ref="main"></div>
       </div>
       <div class="code">
         <div>
@@ -17,7 +25,7 @@
           <span>{{result['警示']}}</span>
           <div @click="filter('警示')">查看详情</div>
         </div>
-        <div id="main1" style="width:150px;height:150px"></div>
+        <div id="main1" style="width:150px;height:150px" ref="main1"></div>
       </div>
       <div class="code">
         <div>
@@ -25,7 +33,7 @@
           <span>{{result['提示']}}</span>
           <div @click="filter('提示')">查看详情</div>
         </div>
-        <div id="main2" style="width:150px;height:150px"></div>
+        <div id="main2" style="width:150px;height:150px" ref="main2"></div>
       </div>
       <div class="code">
         <div>
@@ -33,11 +41,11 @@
           <span>{{result['利好']}}</span>
           <div @click="filter('利好')">查看详情</div>
         </div>
-        <div id="main3" style="width:150px;height:150px"></div>
+        <div id="main3" style="width:150px;height:150px" ref="main3"></div>
       </div>
     </div>
     <div class="code2">
-      <div id="main4" style="width:100%;height:300px"></div>
+      <div id="main4" style="width:100%;height:300px" ref="main4"></div>
     </div>
   </div>
 </template>
@@ -47,12 +55,42 @@ import * as echarts from "echarts";
 export default {
   data() {
     return {
+      date: "",
       input: "",
-      result: {},
-      res: this.$store.state.res
+      result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
+      res2: this.$store.state.res,
+      res: "",
+      gaugeData: [],
+      myChart: "",
+      myChart1: "",
+      myChart2: "",
+      myChart3: "",
+      myChart4: ""
     };
   },
   methods: {
+    into() {
+      this.res = this.res2.filter(
+        item => 1666972800 - item.时间戳 <= this.date
+      );
+      this.res.forEach(item => {
+        if (this.result[item["等级"]]) {
+          this.result[item["等级"]]++;
+        } else {
+          this.result[item["等级"]] = 1;
+        }
+      });
+    },
+    DateTime(a) {
+      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 };
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
+      this.show();
+      this.show1();
+      this.show2();
+      this.show3();
+    },
     filter(a) {
       this.$router.push({
         name: "details",
@@ -63,12 +101,10 @@ export default {
       });
     },
     show() {
-      let chartDom = document.getElementById("main");
-      let myChart = echarts.init(chartDom);
       let option;
-      const gaugeData = [
+      this.gaugeData = [
         {
-          value: ((1 / 170) * 100).toFixed(2),
+          value: ((this.result["高风险"] / this.res.length) * 100).toFixed(2),
           detail: {
             valueAnimation: false,
             offsetCenter: ["0%", "0%"]
@@ -110,7 +146,7 @@ export default {
               show: false,
               distance: 50
             },
-            data: gaugeData,
+            data: this.gaugeData,
             detail: {
               fontSize: 20,
               color: "red",
@@ -119,11 +155,9 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart.setOption(option, true);
     },
     show1() {
-      let chartDom = document.getElementById("main1");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -179,13 +213,11 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart1.setOption(option, true);
     },
     show2() {
-      let chartDom = document.getElementById("main2");
-      let myChart = echarts.init(chartDom);
       let option;
-      const gaugeData = [
+      this.gaugeData = [
         {
           value: ((this.result["提示"] / this.res.length) * 100).toFixed(2),
           detail: {
@@ -229,7 +261,7 @@ export default {
               show: false,
               distance: 50
             },
-            data: gaugeData,
+            data: this.gaugeData,
             detail: {
               fontSize: 20,
               color: "#aa77cc",
@@ -239,11 +271,9 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart2.setOption(option, true);
     },
     show3() {
-      let chartDom = document.getElementById("main3");
-      let myChart = echarts.init(chartDom);
       let option;
       const gaugeData = [
         {
@@ -254,6 +284,7 @@ export default {
           }
         }
       ];
+
       option = {
         series: [
           {
@@ -300,13 +331,12 @@ export default {
           }
         ]
       };
-      option && myChart.setOption(option);
+      option && this.myChart3.setOption(option);
     },
     show4() {
-      var chartDom = document.getElementById("main4");
-      var myChart = echarts.init(chartDom);
+      let main4 = this.$refs.main4;
+      let myChart4 = echarts.init(main4);
       var option;
-
       setTimeout(function() {
         option = {
           legend: {},
@@ -356,11 +386,11 @@ export default {
             }
           ]
         };
-        myChart.on("updateAxisPointer", function(event) {
+        myChart4.on("updateAxisPointer", function(event) {
           const xAxisInfo = event.axesInfo[0];
           if (xAxisInfo) {
             const dimension = xAxisInfo.value + 1;
-            myChart.setOption({
+            myChart4.setOption({
               series: {
                 id: "pie",
                 label: {
@@ -374,13 +404,21 @@ export default {
             });
           }
         });
-        myChart.setOption(option);
+        myChart4.setOption(option);
       });
 
-      option && myChart.setOption(option);
+      option && myChart4.setOption(option);
     }
   },
   mounted() {
+    let main1 = this.$refs.main1;
+    this.myChart1 = echarts.init(main1);
+    let main2 = this.$refs.main2;
+    this.myChart2 = echarts.init(main2);
+    let main3 = this.$refs.main3;
+    this.myChart3 = echarts.init(main3);
+    let main = this.$refs.main;
+    this.myChart = echarts.init(main);
     this.show();
     this.show1();
     this.show2();
@@ -388,27 +426,24 @@ export default {
     this.show4();
   },
   created() {
-    this.res.forEach(item => {
-      if (this.result[item["等级"]]) {
-        this.result[item["等级"]]++;
-      } else {
-        this.result[item["等级"]] = 1;
-      }
-    });
+    this.date = this.$store.state.date;
+    this.into();
   }
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .about {
   .input {
-    margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
+    margin: 20px;
+    .active {
+      color: aqua;
+    }
     span {
-      margin-left: 10px;
-      font-size: 12px;
       cursor: pointer;
+      margin-left: 10px;
     }
   }
   .action {
@@ -425,6 +460,7 @@ export default {
       align-items: center;
       div {
         p {
+          font-size: 24px;
           font-weight: 100;
           margin: 0;
         }

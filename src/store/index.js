@@ -5,11 +5,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    res
+    res,
+    date: 86400
   },
   getters: {
   },
   mutations: {
+    DateChange(state, a) {
+      state.date = a
+    }
   },
   actions: {
   },
