@@ -5,7 +5,6 @@
     <div class="input">
       <div>
         动态时间：
-        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
         <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
         <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
       </div>
@@ -45,7 +44,7 @@
       </div>
     </div>
     <div class="code2">
-      <div id="main4" style="width:100%;height:500px"></div>
+      <div id="main4" style="width:100%;height:480px"></div>
     </div>
   </div>
 </template>
@@ -55,6 +54,53 @@ import * as echarts from "echarts";
 export default {
   data() {
     return {
+      info_30: [
+        { name: "专利信息", value: 248 },
+        { name: "招投标", value: 145 },
+        { name: "法律诉讼", value: 84 },
+        { name: "开庭公告", value: 70 },
+        { name: "商标信息", value: 32 },
+        { name: "软件著作权", value: 19 },
+        { name: "客户", value: 17 },
+        { name: "法院公告", value: 16 },
+        { name: "注册地址变更", value: 12 },
+        { name: "法定代表人变更", value: 12 },
+        { name: "主要人员变更", value: 11 },
+        { name: "对外投资", value: 11 },
+        { name: "经营范围变更", value: 9 },
+        { name: "股东变更", value: 8 },
+        { name: "电信许可", value: 8 },
+        { name: "登记机关变更", value: 8 },
+        { name: "供应商", value: 6 },
+        { name: "注册资本变更", value: 5 },
+        { name: "企业类型变更", value: 4 },
+        { name: "经营异常", value: 3 },
+        { name: "被执行人", value: 3 },
+        { name: "送达公告", value: 2 },
+        { name: "企业状态变更", value: 2 },
+        { name: "融资动态", value: 1 },
+        { name: "立案信息", value: 1 },
+        { name: "股权出质", value: 1 }
+      ],
+      info_7: [
+        { name: "法律诉讼", value: 44 },
+        { name: "专利信息", value: 40 },
+        { name: "招投标", value: 32 },
+        { name: "客户", value: 7 },
+        { name: "法院公告", value: 7 },
+        { name: "软件著作权", value: 6 },
+        { name: "开庭公告", value: 3 },
+        { name: "法定代表人变更", value: 3 },
+        { name: "经营范围变更", value: 2 },
+        { name: "供应商", value: 2 },
+        { name: "对外投资", value: 2 },
+        { name: "被执行人", value: 2 },
+        { name: "注册资本变更", value: 1 },
+        { name: "注册地址变更", value: 1 },
+        { name: "主要人员变更", value: 1 },
+        { name: "经营异常", value: 1 }
+      ],
+      info: [],
       date: this.$store.state.date,
       myChart: "",
       myChart1: "",
@@ -129,6 +175,11 @@ export default {
   },
   methods: {
     into() {
+      if (this.date == 604800) {
+        this.info = this.info_7;
+      } else {
+        this.info = this.info_30;
+      }
       this.res = this.res2.filter(
         item => 1666972800 - item.时间戳 <= this.date
       );
@@ -149,6 +200,7 @@ export default {
       this.show1();
       this.show2();
       this.show3();
+      this.show4();
     },
     filter(b) {
       this.$router.push({
@@ -381,30 +433,7 @@ export default {
       var myChart = echarts.init(chartDom);
       var option;
 
-      var data = [
-        { name: "专利信息", value: 271 },
-        { name: "主要人员变更", value: 5 },
-        { name: "企业类型变更", value: 3 },
-        { name: "作品著作权", value: 4 },
-        { name: "商标信息", value: 40 },
-        { name: "对外投资", value: 9 },
-        { name: "开庭公告", value: 50 },
-        { name: "招投标", value: 133 },
-        { name: "法定代表人变更", value: 4 },
-        { name: "法律诉讼", value: 41 },
-        { name: "法院公告", value: 1 },
-        { name: "注册地址变更", value: 4 },
-        { name: "注册资本变更", value: 2 },
-        { name: "电信许可", value: 5 },
-        { name: "登记机关变更", value: 2 },
-        { name: "经营范围变更", value: 5 },
-        { name: "股东变更", value: 8 },
-        { name: "股权出质", value: 1 },
-        { name: "股权变更", value: 1 },
-        { name: "融资动态", value: 2 },
-        { name: "软件著作权", value: 21 },
-        { name: "送达公告", value: 2 }
-      ];
+      var data = this.info;
       data = data.sort((a, b) => {
         let value1 = a["value"],
           value2 = b["value"];
@@ -420,7 +449,7 @@ export default {
           left: "center",
           width: "700px",
           label: {
-            formatter: "{name|{b} {d}%} \n",
+            formatter: "{name|{b}{c} {d}%} \n",
             minMargin: 1,
             edgeDistance: 1,
             lineHeight: 1,
@@ -435,6 +464,15 @@ export default {
         }
       };
       option && myChart.setOption(option);
+      myChart.on("click", param => {
+        var name = param.name;
+        this.$router.push({
+          name: "details",
+          params: {
+            name
+          }
+        });
+      });
     }
   },
   mounted() {
@@ -492,6 +530,10 @@ export default {
       div {
         font-size: 12px;
         font-weight: 100;
+        cursor: pointer;
+        &:hover {
+          color: aqua;
+        }
       }
       span {
         display: block;

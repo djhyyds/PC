@@ -694,9 +694,9 @@ export default {
               color: "source",
               curveness: 0.4
             },
-            emphasis: {
-              focus: "adjacency"
-            },
+            // emphasis: {
+            //   focus: "adjacency"
+            // },
             itemStyle: {
               color: "#1f77b4",
               borderColor: "#1f77b4"

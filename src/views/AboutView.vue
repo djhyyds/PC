@@ -5,17 +5,8 @@
     <div class="input">
       <div>
         动态时间：
-        <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
-          >今天</span
-        >
-        <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''"
-          >近7天</span
-        >
-        <span
-          @click="DateTime(2592000)"
-          :class="date == 2592000 ? 'active' : ''"
-          >近30天</span
-        >
+        <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date == 2592000 ? 'active' : ''">近30天</span>
       </div>
     </div>
     <div class="action">
@@ -53,18 +44,203 @@
       </div>
     </div>
     <div class="code2">
-      <div id="main4" style="width: 100%; height: 300px" ref="main4"></div>
+      <div id="main4" style="width: 100%; height: 400px" ref="main4"></div>
     </div>
   </div>
 </template>
 
 <script>
-import * as echarts from "echarts"
+import * as echarts from "echarts";
 export default {
-  data () {
+  data() {
     return {
       date: "",
       input: "",
+      source: [],
+      source_30: [
+        [
+          "date",
+          "2022-10-12",
+          "2022-10-13",
+          "2022-10-14",
+          "2022-10-15",
+          "2022-10-16",
+          "2022-10-17",
+          "2022-10-18",
+          "2022-10-19",
+          "2022-10-20",
+          "2022-10-21",
+          "2022-10-22",
+          "2022-10-23",
+          "2022-10-24",
+          "2022-10-25",
+          "2022-10-26",
+          "2022-10-27",
+          "2022-10-28",
+          "2022-10-29",
+          "2022-10-30",
+          "2022-10-31",
+          "2022-11-01",
+          "2022-11-02",
+          "2022-11-03",
+          "2022-11-04",
+          "2022-11-05",
+          "2022-11-06",
+          "2022-11-07",
+          "2022-11-08",
+          "2022-11-09",
+          "2022-11-10"
+        ],
+        [
+          "提示",
+          36,
+          28,
+          12,
+          1,
+          0,
+          3,
+          9,
+          6,
+          15,
+          13,
+          0,
+          0,
+          8,
+          4,
+          9,
+          13,
+          7,
+          4,
+          1,
+          7,
+          10,
+          7,
+          7,
+          4,
+          1,
+          4,
+          6,
+          7,
+          10,
+          3
+        ],
+        [
+          "利好",
+          4,
+          0,
+          41,
+          0,
+          0,
+          28,
+          20,
+          0,
+          0,
+          24,
+          0,
+          0,
+          4,
+          32,
+          14,
+          0,
+          55,
+          0,
+          0,
+          1,
+          31,
+          0,
+          0,
+          34,
+          4,
+          0,
+          1,
+          7,
+          0,
+          0
+        ],
+        [
+          "警示",
+          0,
+          49,
+          5,
+          1,
+          1,
+          1,
+          0,
+          2,
+          4,
+          12,
+          2,
+          1,
+          0,
+          2,
+          4,
+          8,
+          7,
+          1,
+          9,
+          1,
+          0,
+          10,
+          22,
+          1,
+          21,
+          0,
+          3,
+          1,
+          6,
+          0
+        ],
+        [
+          "高风险",
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          2,
+          0
+        ]
+      ],
+      source_7: [
+        [
+          "date",
+          "2022-11-03",
+          "2022-11-04",
+          "2022-11-05",
+          "2022-11-06",
+          "2022-11-07",
+          "2022-11-08",
+          "2022-11-09",
+          "2022-11-10"
+        ],
+        ["提示", 7, 4, 1, 4, 6, 7, 10, 3],
+        ["利好", 0, 34, 4, 0, 1, 7, 0, 0],
+        ["警示", 22, 1, 21, 0, 3, 1, 6, 0],
+        ["高风险", 0, 0, 0, 0, 1, 0, 2, 0]
+      ],
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
       res2: this.$store.state.res,
       res: "",
@@ -74,43 +250,44 @@ export default {
       myChart2: "",
       myChart3: "",
       myChart4: ""
-    }
+    };
   },
   methods: {
-    into () {
+    into() {
       this.res = this.res2.filter(
         item => 1666972800 - item.时间戳 <= this.date
-      )
+      );
       this.res.forEach(item => {
         if (this.result[item["等级"]]) {
-          this.result[item["等级"]]++
+          this.result[item["等级"]]++;
         } else {
-          this.result[item["等级"]] = 1
+          this.result[item["等级"]] = 1;
         }
-      })
+      });
     },
-    DateTime (a) {
-
-      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 }
-      this.$store.commit("DateChange", a)
-      this.date = this.$store.state.date
-      this.into()
-      this.show()
-      this.show1()
-      this.show2()
-      this.show3()
+    DateTime(a) {
+      this.source = a == 604800 ? this.source_7 : this.source_30;
+      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 };
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
+      this.show();
+      this.show1();
+      this.show2();
+      this.show3();
+      this.show4();
     },
-    filter (a) {
+    filter(a) {
       this.$router.push({
         name: "details",
         params: {
           result: "等级",
           a
         }
-      })
+      });
     },
-    show () {
-      let option
+    show() {
+      let option;
       this.gaugeData = [
         {
           value: ((this.result["高风险"] / this.res.length) * 100).toFixed(2),
@@ -119,7 +296,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -163,11 +340,11 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart.setOption(option, true)
+      };
+      option && this.myChart.setOption(option, true);
     },
-    show1 () {
-      let option
+    show1() {
+      let option;
       const gaugeData = [
         {
           value: ((this.result["警示"] / this.res.length) * 100).toFixed(2),
@@ -176,7 +353,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -221,11 +398,11 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart1.setOption(option, true)
+      };
+      option && this.myChart1.setOption(option, true);
     },
-    show2 () {
-      let option
+    show2() {
+      let option;
       this.gaugeData = [
         {
           value: ((this.result["提示"] / this.res.length) * 100).toFixed(2),
@@ -234,7 +411,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -279,11 +456,11 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart2.setOption(option, true)
+      };
+      option && this.myChart2.setOption(option, true);
     },
-    show3 () {
-      let option
+    show3() {
+      let option;
       const gaugeData = [
         {
           value: ((this.result["利好"] / this.res.length) * 100).toFixed(2),
@@ -292,7 +469,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
 
       option = {
         series: [
@@ -339,104 +516,136 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart3.setOption(option)
+      };
+      option && this.myChart3.setOption(option);
     },
-    show4 () {
-      let main4 = this.$refs.main4
-      let myChart4 = echarts.init(main4)
-      var option
-      setTimeout(function () {
-        option = {
-          legend: {},
-          tooltip: {
-            trigger: "axis"
-          },
-          dataset: {
-            source: [
-              ["", "2022-13-13", "23-12-12", "31-12"],
-              ["提示", 56.5, 82.1, 88.7, 70.1, 53.4, 85.1],
-              ["利好", 51.1, 51.4, 55.1, 53.3, 73.8, 68.7],
-              ["警示", 20.1, 62.2, 69.5, 36.4, 45.2, 32.5],
-              ["高风险", 25.2, 37.1, 41.2, 18, 33.9, 49.1]
-            ]
-          },
-          xAxis: { type: "category", boundaryGap: false },
-          yAxis: { gridIndex: 0 },
-          grid: { top: "20%" },
-          series: [
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              symbol: "none",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            }
-          ]
-        }
-        myChart4.on("updateAxisPointer", function (event) {
-          const xAxisInfo = event.axesInfo[0]
-          if (xAxisInfo) {
-            const dimension = xAxisInfo.value + 1
-            myChart4.setOption({
-              series: {
-                id: "pie",
+    show4() {
+      var option;
+      option = {
+        legend: {},
+        // tooltip: {
+        //   trigger: "axis"
+        // },
+        dataset: {
+          source: this.source
+        },
+        xAxis: { type: "category", boundaryGap: false },
+        yAxis: { gridIndex: 0 },
+        grid: { top: "20%" },
+        series: [
+          {
+            type: "line",
+            smooth: true,
+            seriesLayoutBy: "row",
+            // symbol: "none",
+
+            emphasis: { focus: "series" },
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
                 label: {
-                  formatter: "{b}: {@[" + dimension + "]} ({d}%)"
-                },
-                encode: {
-                  value: dimension,
-                  tooltip: dimension
+                  show: true // 在折线拐点上显示数据
                 }
               }
-            })
+            }
+          },
+          {
+            type: "line",
+            smooth: true,
+            // symbol: "none",
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                }
+              }
+            }
+          },
+          {
+            type: "line",
+            smooth: true,
+            // symbol: "none",
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                }
+              }
+            }
+          },
+          {
+            type: "line",
+            smooth: true,
+          
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                }
+              }
+            }
           }
-        })
-        myChart4.setOption(option)
-      })
-
-      option && myChart4.setOption(option)
+        ]
+      };
+      this.myChart4.on("updateAxisPointer", event => {
+        const xAxisInfo = event.axesInfo[0];
+        if (xAxisInfo) {
+          const dimension = xAxisInfo.value + 1;
+          this.myChart4.setOption({
+            series: {
+              id: "pie",
+              label: {
+                formatter: "{b}: {@[" + dimension + "]} ({d}%)"
+              },
+              encode: {
+                value: dimension,
+                tooltip: dimension
+              }
+            }
+          });
+        }
+      });
+      option && this.myChart4.setOption(option);
     }
   },
-  mounted () {
-    let main1 = this.$refs.main1
-    this.myChart1 = echarts.init(main1)
-    let main2 = this.$refs.main2
-    this.myChart2 = echarts.init(main2)
-    let main3 = this.$refs.main3
-    this.myChart3 = echarts.init(main3)
-    let main = this.$refs.main
-    this.myChart = echarts.init(main)
-    this.show()
-    this.show1()
-    this.show2()
-    this.show3()
-    this.show4()
+  mounted() {
+    let main1 = this.$refs.main1;
+    this.myChart1 = echarts.init(main1);
+    let main2 = this.$refs.main2;
+    this.myChart2 = echarts.init(main2);
+    let main3 = this.$refs.main3;
+    this.myChart3 = echarts.init(main3);
+    let main = this.$refs.main;
+    this.myChart = echarts.init(main);
+    let main4 = this.$refs.main4;
+    this.myChart4 = echarts.init(main4);
+    this.show();
+    this.show1();
+    this.show2();
+    this.show3();
+    this.show4();
   },
-  created () {
-    this.date = this.$store.state.date
-    this.into()
+  created() {
+    this.source = this.source_7;
+    this.date = this.$store.state.date;
+    let result2 = {};
+    this.res2.forEach(item => {
+      if (result2[item["分组"]]) {
+        result2[item["分组"]]++;
+      } else {
+        result2[item["分组"]] = 1;
+      }
+    });
+    this.into();
   }
 };
 </script>
@@ -474,6 +683,10 @@ export default {
           margin: 0;
         }
         div {
+          cursor: pointer;
+          &:hover {
+            color: aqua;
+          }
           font-size: 12px;
           font-weight: 100;
         }

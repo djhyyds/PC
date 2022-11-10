@@ -8,9 +8,9 @@
               <span>风险监测</span>
             </template>
             <el-menu-item index="1" @click="$router.push({path:'/about'})">风险级别</el-menu-item>
-            <el-menu-item index="2" @click="$router.push({path:'/risk'})">风险维度</el-menu-item>
-            <el-menu-item index="3" @click="$router.push({name:'details',params:{a:''}})">监控动态</el-menu-item>
+            <el-menu-item index="2" @click="$router.push({path:'/risk'})">风险维度</el-menu-item>         
           </el-submenu>
+           <el-menu-item index="3" @click="$router.push({name:'details',params:{a:''}})">监控动态</el-menu-item>
           <el-menu-item index="4" @click="$router.push({path:'/gu'})">股权穿透</el-menu-item>
         </el-menu>
       </el-aside>

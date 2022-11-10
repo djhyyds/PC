@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import res from "../assets/qy_20221103.json";
+import res from "../assets/web_info.json";
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     res,
-    date: 86400
+    date: 604800,
   },
   getters: {
   },

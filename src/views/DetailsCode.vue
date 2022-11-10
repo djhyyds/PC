@@ -41,10 +41,20 @@
             <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item>
+          <el-select
+            v-model="search2"
+            filterable
+            clearable
+            @change="onSearch"
+            placeholder="请选择分组"
+          >
+            <el-option v-for="item in setOption2" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div>
         动态时间：
-        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
         <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
         <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
       </div>
@@ -57,8 +67,9 @@
       <el-table :data="tableData" border style="width: 100%;margin-top:20px" height="590px">
         <el-table-column fixed label="监控主体" min-width="200" header-align="center">
           <template slot-scope="scope">
-            <el-link type="primary" :underline="false">{{ scope.row['公司']}}</el-link><br>
-            <el-link type="warning" :underline="false">历史监控动态</el-link>
+            <el-link type="primary" :underline="false">{{ scope.row['公司']}}</el-link>
+            <br />
+            <!-- <el-link type="warning" :underline="false">历史监控动态</el-link> -->
           </template>
         </el-table-column>
         <el-table-column label="风险级别" min-width="80" align="center">
@@ -121,13 +132,14 @@ function findAllParent(node) {
     return [node.data.value];
   }
 }
-function filter(a, b, c, d, e, data) {
+function filter(a, b, c, d, f, e, data) {
   return data.filter(item => {
     let bool = true;
     let bool2 = true;
     let bool3 = true;
     let bool4 = true;
     let bool5 = true;
+    let bool6 = true;
     if (a) {
       bool = item.等级 === a;
     }
@@ -140,10 +152,14 @@ function filter(a, b, c, d, e, data) {
     if (d) {
       bool4 = item.公司 === d;
     }
+    if (f) {
+      bool6 = item.分组 === f;
+    }
+    console.log(f===item.分组);
     if (e) {
       bool5 = 1666972800 - item.时间戳 <= e;
     }
-    return bool && bool2 && bool3 && bool4 && bool5;
+    return bool && bool2 && bool3 && bool4 && bool5 && bool6;
   });
 }
 export default {
@@ -151,7 +167,9 @@ export default {
     return {
       date: this.$store.state.date,
       setOption: [],
+      setOption2: [],
       search: "",
+      search2: "",
       input: "",
       formInline: {
         region: ""
@@ -318,6 +336,7 @@ export default {
     onSubmit() {
       this.into();
     },
+
     into() {
       // if (this.value.length == 1) {
       //   this.res = this.res.filter(item => item["风险维度"] == this.value[0]);
@@ -333,6 +352,7 @@ export default {
       //   );
       // }
       this.setOption = [];
+      this.setOption2 = [];
       this.risk = this.formInline.region;
       let b, c;
       if (Array.isArray(this.value)) {
@@ -342,7 +362,11 @@ export default {
           b = this.value[1];
         }
       } else {
-        c = this.value;
+        if (this.$route.params.name) {
+          b = this.$route.params.name;
+        } else {
+          c = this.$route.params.b;
+        }
       }
 
       this.tableCopeTableList = filter(
@@ -350,6 +374,7 @@ export default {
         b,
         c,
         this.search,
+        this.search2,
         this.date,
         this.res
       );
@@ -359,7 +384,11 @@ export default {
           this.setOption.push(item.公司);
         }
       });
-
+      this.tableCopeTableList.forEach(item => {
+        if (this.setOption2.indexOf(item.分组) == -1) {
+          this.setOption2.push(item.分组);
+        }
+      });
     },
     // fuzzySearch(list, search) {
     //   let data = [];
@@ -377,21 +406,22 @@ export default {
     // },
     onSearch() {
       this.into();
+      console.log(this.search2);
     }
   },
   created() {
     this.res = this.$store.state.res;
     this.formInline.region = this.$route.params.a;
-    this.value = this.$route.params.b;
-
-    // this.result = this.$route.params.result;
+    if (this.$route.params.name) {
+      this.value = this.$route.params.name;
+    } else {
+      this.value = this.$route.params.b;
+    }
     this.into();
-  },
-  beforeMount() {
-    // if(this.risk=='')
-    // this.tableCopeTableList = this.$store.state.res;
-    this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
   }
+  // beforeMount() {
+  //   // this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
+  // }
 };
 </script>
 <style  lang='less'>
