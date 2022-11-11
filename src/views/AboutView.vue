@@ -1,12 +1,56 @@
 <template>
   <div class="about">
-    <h3>风险级别</h3>
+    <h2>风险级别</h2>
     <hr />
     <div class="input">
+      <el-form :inline="true" class="demo-form-inline">
+        <!-- <el-form-item>
+          <el-select
+            style="width:130px"
+            @change="onSubmit"
+            v-model="formInline.region"
+            placeholder="风险级别"
+          >
+            <el-option label="全部" value></el-option>
+            <el-option label="高风险" value="高风险"></el-option>
+            <el-option label="警示" value="警示"></el-option>
+            <el-option label="提示" value="提示"></el-option>
+            <el-option label="利好" value="利好"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-cascader
+            v-model="value"
+            :options="options"
+            :show-all-levels="false"
+            :props="{ checkStrictly: true, expandTrigger: 'hover' }"
+            popper-class="myCascade"
+            filterable
+            ref="myCascadeRef"
+          >
+            <template slot-scope="{ node, data }">
+              <div @click="()=>onItemClick(node,data)">
+                <span>{{ data.label }}</span>
+           
+              </div>
+            </template>
+          </el-cascader>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search" filterable clearable @change="onSearch" placeholder="请输入公司名称">
+            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>-->
+        <el-form-item class="box">
+          <el-select v-model="search" filterable clearable @change="into" placeholder="请选择分组">
+            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <div>
         动态时间：
-        <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''">近7天</span>
-        <span @click="DateTime(2592000)" :class="date == 2592000 ? 'active' : ''">近30天</span>
+        <span @click="DateTime(691200)" :class="date==691200?'active':''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
       </div>
     </div>
     <div class="action">
@@ -54,193 +98,195 @@ import * as echarts from "echarts";
 export default {
   data() {
     return {
+      search: "",
       date: "",
       input: "",
       source: [],
-      source_30: [
-        [
-          "date",
-          "2022-10-12",
-          "2022-10-13",
-          "2022-10-14",
-          "2022-10-15",
-          "2022-10-16",
-          "2022-10-17",
-          "2022-10-18",
-          "2022-10-19",
-          "2022-10-20",
-          "2022-10-21",
-          "2022-10-22",
-          "2022-10-23",
-          "2022-10-24",
-          "2022-10-25",
-          "2022-10-26",
-          "2022-10-27",
-          "2022-10-28",
-          "2022-10-29",
-          "2022-10-30",
-          "2022-10-31",
-          "2022-11-01",
-          "2022-11-02",
-          "2022-11-03",
-          "2022-11-04",
-          "2022-11-05",
-          "2022-11-06",
-          "2022-11-07",
-          "2022-11-08",
-          "2022-11-09",
-          "2022-11-10"
-        ],
-        [
-          "提示",
-          36,
-          28,
-          12,
-          1,
-          0,
-          3,
-          9,
-          6,
-          15,
-          13,
-          0,
-          0,
-          8,
-          4,
-          9,
-          13,
-          7,
-          4,
-          1,
-          7,
-          10,
-          7,
-          7,
-          4,
-          1,
-          4,
-          6,
-          7,
-          10,
-          3
-        ],
-        [
-          "利好",
-          4,
-          0,
-          41,
-          0,
-          0,
-          28,
-          20,
-          0,
-          0,
-          24,
-          0,
-          0,
-          4,
-          32,
-          14,
-          0,
-          55,
-          0,
-          0,
-          1,
-          31,
-          0,
-          0,
-          34,
-          4,
-          0,
-          1,
-          7,
-          0,
-          0
-        ],
-        [
-          "警示",
-          0,
-          49,
-          5,
-          1,
-          1,
-          1,
-          0,
-          2,
-          4,
-          12,
-          2,
-          1,
-          0,
-          2,
-          4,
-          8,
-          7,
-          1,
-          9,
-          1,
-          0,
-          10,
-          22,
-          1,
-          21,
-          0,
-          3,
-          1,
-          6,
-          0
-        ],
-        [
-          "高风险",
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0,
-          1,
-          0,
-          0,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0,
-          1,
-          0,
-          2,
-          0
-        ]
-      ],
-      source_7: [
-        [
-          "date",
-          "2022-11-03",
-          "2022-11-04",
-          "2022-11-05",
-          "2022-11-06",
-          "2022-11-07",
-          "2022-11-08",
-          "2022-11-09",
-          "2022-11-10"
-        ],
-        ["提示", 7, 4, 1, 4, 6, 7, 10, 3],
-        ["利好", 0, 34, 4, 0, 1, 7, 0, 0],
-        ["警示", 22, 1, 21, 0, 3, 1, 6, 0],
-        ["高风险", 0, 0, 0, 0, 1, 0, 2, 0]
-      ],
+      setOption: ["全部"],
+      // source_30: [
+      //   [
+      //     "date",
+      //     "2022-10-12",
+      //     "2022-10-13",
+      //     "2022-10-14",
+      //     "2022-10-15",
+      //     "2022-10-16",
+      //     "2022-10-17",
+      //     "2022-10-18",
+      //     "2022-10-19",
+      //     "2022-10-20",
+      //     "2022-10-21",
+      //     "2022-10-22",
+      //     "2022-10-23",
+      //     "2022-10-24",
+      //     "2022-10-25",
+      //     "2022-10-26",
+      //     "2022-10-27",
+      //     "2022-10-28",
+      //     "2022-10-29",
+      //     "2022-10-30",
+      //     "2022-10-31",
+      //     "2022-11-01",
+      //     "2022-11-02",
+      //     "2022-11-03",
+      //     "2022-11-04",
+      //     "2022-11-05",
+      //     "2022-11-06",
+      //     "2022-11-07",
+      //     "2022-11-08",
+      //     "2022-11-09",
+      //     "2022-11-10"
+      //   ],
+      //   [
+      //     "提示",
+      //     36,
+      //     28,
+      //     12,
+      //     1,
+      //     0,
+      //     3,
+      //     9,
+      //     6,
+      //     15,
+      //     13,
+      //     0,
+      //     0,
+      //     8,
+      //     4,
+      //     9,
+      //     13,
+      //     7,
+      //     4,
+      //     1,
+      //     7,
+      //     10,
+      //     7,
+      //     7,
+      //     4,
+      //     1,
+      //     4,
+      //     6,
+      //     7,
+      //     10,
+      //     3
+      //   ],
+      //   [
+      //     "利好",
+      //     4,
+      //     0,
+      //     41,
+      //     0,
+      //     0,
+      //     28,
+      //     20,
+      //     0,
+      //     0,
+      //     24,
+      //     0,
+      //     0,
+      //     4,
+      //     32,
+      //     14,
+      //     0,
+      //     55,
+      //     0,
+      //     0,
+      //     1,
+      //     31,
+      //     0,
+      //     0,
+      //     34,
+      //     4,
+      //     0,
+      //     1,
+      //     7,
+      //     0,
+      //     0
+      //   ],
+      //   [
+      //     "警示",
+      //     0,
+      //     49,
+      //     5,
+      //     1,
+      //     1,
+      //     1,
+      //     0,
+      //     2,
+      //     4,
+      //     12,
+      //     2,
+      //     1,
+      //     0,
+      //     2,
+      //     4,
+      //     8,
+      //     7,
+      //     1,
+      //     9,
+      //     1,
+      //     0,
+      //     10,
+      //     22,
+      //     1,
+      //     21,
+      //     0,
+      //     3,
+      //     1,
+      //     6,
+      //     0
+      //   ],
+      //   [
+      //     "高风险",
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     1,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     1,
+      //     0,
+      //     0,
+      //     0,
+      //     1,
+      //     0,
+      //     0,
+      //     0,
+      //     0,
+      //     1,
+      //     0,
+      //     2,
+      //     0
+      //   ]
+      // ],
+      // source_7: [
+      //   [
+      //     "date",
+      //     "2022-11-03",
+      //     "2022-11-04",
+      //     "2022-11-05",
+      //     "2022-11-06",
+      //     "2022-11-07",
+      //     "2022-11-08",
+      //     "2022-11-09",
+      //     "2022-11-10"
+      //   ],
+      //   ["提示", 7, 4, 1, 4, 6, 7, 10, 3],
+      //   ["利好", 0, 34, 4, 0, 1, 7, 0, 0],
+      //   ["警示", 22, 1, 21, 0, 3, 1, 6, 0],
+      //   ["高风险", 0, 0, 0, 0, 1, 0, 2, 0]
+      // ],
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
       res2: this.$store.state.res,
       res: "",
@@ -254,9 +300,30 @@ export default {
   },
   methods: {
     into() {
-      this.res = this.res2.filter(
-        item => 1666972800 - item.时间戳 <= this.date
-      );
+      this.$store.commit("groupChange", this.search);
+      let source2 = this.$store.state.groupData;
+      console.log(source2);
+      this.source = source2.filter(item => {
+        let bool = true;
+        if (this.search) {
+          bool = item.group.substring(0, 1) == this.search.substring(0, 1);
+          return bool;
+        } else {
+          return item.group == "全部";
+        }
+      });
+      console.log(this.source);
+      this.source =
+        this.date === 691200
+          ? this.source[1].source_7
+          : this.source[0].source_30;
+      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 };
+      this.res = this.res2.filter(item => {
+        let bool = true;
+        if (this.search && this.search != "全部")
+          bool = item.分组.substring(0, 1) == this.search.substring(0, 1);
+        return 1668182400 - item.时间戳 <= this.date && bool;
+      });
       this.res.forEach(item => {
         if (this.result[item["等级"]]) {
           this.result[item["等级"]]++;
@@ -264,9 +331,13 @@ export default {
           this.result[item["等级"]] = 1;
         }
       });
+      this.show4();
+      this.show();
+      this.show1();
+      this.show2();
+      this.show3();
     },
     DateTime(a) {
-      this.source = a == 604800 ? this.source_7 : this.source_30;
       this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 };
       this.$store.commit("DateChange", a);
       this.date = this.$store.state.date;
@@ -582,7 +653,7 @@ export default {
           {
             type: "line",
             smooth: true,
-          
+
             seriesLayoutBy: "row",
             emphasis: { focus: "series" },
             symbolSize: 8,
@@ -628,24 +699,23 @@ export default {
     this.myChart = echarts.init(main);
     let main4 = this.$refs.main4;
     this.myChart4 = echarts.init(main4);
-    this.show();
-    this.show1();
-    this.show2();
-    this.show3();
-    this.show4();
+    // this.show();
+    // this.show1();
+    // this.show2();
+    // this.show3();
+    // this.show4();
+    this.into();
   },
   created() {
-    this.source = this.source_7;
-    this.date = this.$store.state.date;
-    let result2 = {};
+    this.search = this.$store.state.group;
     this.res2.forEach(item => {
-      if (result2[item["分组"]]) {
-        result2[item["分组"]]++;
-      } else {
-        result2[item["分组"]] = 1;
+      if (this.setOption.indexOf(item.分组) == -1) {
+        this.setOption.push(item.分组);
       }
     });
-    this.into();
+    // this.source = this.$store.state.groupData[1].source_7;
+    // console.log(this.source);
+    this.date = this.$store.state.date;
   }
 };
 </script>
@@ -653,15 +723,18 @@ export default {
 <style lang='less' scoped>
 .about {
   .input {
+    margin-top: 30px;
     display: flex;
-    justify-content: end;
-    margin: 20px;
-    .active {
-      color: aqua;
-    }
-    span {
-      cursor: pointer;
-      margin-left: 10px;
+    justify-content: space-between;
+
+    div {
+      .active {
+        color: aqua;
+      }
+      span {
+        cursor: pointer;
+        margin-left: 10px;
+      }
     }
   }
   .action {

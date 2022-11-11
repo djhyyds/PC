@@ -652,7 +652,7 @@ export default {
       }
       function nodeMap () {
         return nodes.map((item) => {
-          console.log(item, 'item')
+          // console.log(item, 'item')
           const obj = {
             ...item
           }

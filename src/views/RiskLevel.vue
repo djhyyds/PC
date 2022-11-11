@@ -1,11 +1,55 @@
 <template>
   <div class="risk">
-    <h3>风险维度</h3>
+    <h2>风险维度</h2>
     <hr />
     <div class="input">
+      <el-form :inline="true" class="demo-form-inline">
+        <!-- <el-form-item>
+          <el-select
+            style="width:130px"
+            @change="onSubmit"
+            v-model="formInline.region"
+            placeholder="风险级别"
+          >
+            <el-option label="全部" value></el-option>
+            <el-option label="高风险" value="高风险"></el-option>
+            <el-option label="警示" value="警示"></el-option>
+            <el-option label="提示" value="提示"></el-option>
+            <el-option label="利好" value="利好"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-cascader
+            v-model="value"
+            :options="options"
+            :show-all-levels="false"
+            :props="{ checkStrictly: true, expandTrigger: 'hover' }"
+            popper-class="myCascade"
+            filterable
+            ref="myCascadeRef"
+          >
+            <template slot-scope="{ node, data }">
+              <div @click="()=>onItemClick(node,data)">
+                <span>{{ data.label }}</span>
+           
+              </div>
+            </template>
+          </el-cascader>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search" filterable clearable @change="onSearch" placeholder="请输入公司名称">
+            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>-->
+        <el-form-item class="box">
+          <el-select v-model="search" filterable clearable @change="into" placeholder="请选择分组">
+            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <div>
         动态时间：
-        <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
+        <span @click="DateTime(691200)" :class="date==691200?'active':''">近7天</span>
         <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
       </div>
     </div>
@@ -54,52 +98,8 @@ import * as echarts from "echarts";
 export default {
   data() {
     return {
-      info_30: [
-        { name: "专利信息", value: 248 },
-        { name: "招投标", value: 145 },
-        { name: "法律诉讼", value: 84 },
-        { name: "开庭公告", value: 70 },
-        { name: "商标信息", value: 32 },
-        { name: "软件著作权", value: 19 },
-        { name: "客户", value: 17 },
-        { name: "法院公告", value: 16 },
-        { name: "注册地址变更", value: 12 },
-        { name: "法定代表人变更", value: 12 },
-        { name: "主要人员变更", value: 11 },
-        { name: "对外投资", value: 11 },
-        { name: "经营范围变更", value: 9 },
-        { name: "股东变更", value: 8 },
-        { name: "电信许可", value: 8 },
-        { name: "登记机关变更", value: 8 },
-        { name: "供应商", value: 6 },
-        { name: "注册资本变更", value: 5 },
-        { name: "企业类型变更", value: 4 },
-        { name: "经营异常", value: 3 },
-        { name: "被执行人", value: 3 },
-        { name: "送达公告", value: 2 },
-        { name: "企业状态变更", value: 2 },
-        { name: "融资动态", value: 1 },
-        { name: "立案信息", value: 1 },
-        { name: "股权出质", value: 1 }
-      ],
-      info_7: [
-        { name: "法律诉讼", value: 44 },
-        { name: "专利信息", value: 40 },
-        { name: "招投标", value: 32 },
-        { name: "客户", value: 7 },
-        { name: "法院公告", value: 7 },
-        { name: "软件著作权", value: 6 },
-        { name: "开庭公告", value: 3 },
-        { name: "法定代表人变更", value: 3 },
-        { name: "经营范围变更", value: 2 },
-        { name: "供应商", value: 2 },
-        { name: "对外投资", value: 2 },
-        { name: "被执行人", value: 2 },
-        { name: "注册资本变更", value: 1 },
-        { name: "注册地址变更", value: 1 },
-        { name: "主要人员变更", value: 1 },
-        { name: "经营异常", value: 1 }
-      ],
+      setOption: ["全部"],
+      search: "",
       info: [],
       date: this.$store.state.date,
       myChart: "",
@@ -175,14 +175,26 @@ export default {
   },
   methods: {
     into() {
-      if (this.date == 604800) {
-        this.info = this.info_7;
-      } else {
-        this.info = this.info_30;
-      }
-      this.res = this.res2.filter(
-        item => 1666972800 - item.时间戳 <= this.date
-      );
+      this.$store.commit("groupChange", this.search);
+      this.result = { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 };
+      let info2 = this.$store.state.groupData;
+      this.info = info2.filter(item => {
+        let bool = true;
+        if (this.search) {
+          bool = item.group.substring(0, 1) == this.search.substring(0, 1);
+          return bool;
+        } else {
+          return item.group == "全部";
+        }
+      });
+      this.info =
+        this.date === 691200 ? this.info[3].info_7 : this.info[2].info_30;
+      this.res = this.res2.filter(item => {
+        let bool = true;
+        if (this.search && this.search != "全部")
+          bool = item.分组.substring(0, 1) == this.search.substring(0, 1);
+        return 1668182400 - item.时间戳 <= this.date && bool;
+      });
       this.res.forEach(item => {
         if (this.result[item["风险维度"]]) {
           this.result[item["风险维度"]]++;
@@ -190,17 +202,16 @@ export default {
           this.result[item["风险维度"]] = 1;
         }
       });
-    },
-    DateTime(a) {
-      this.result = { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 };
-      this.$store.commit("DateChange", a);
-      this.date = this.$store.state.date;
-      this.into();
+      this.show4();
       this.show();
       this.show1();
       this.show2();
       this.show3();
-      this.show4();
+    },
+    DateTime(a) {
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
     },
     filter(b) {
       this.$router.push({
@@ -449,7 +460,7 @@ export default {
           left: "center",
           width: "700px",
           label: {
-            formatter: "{name|{b}{c} {d}%} \n",
+            formatter: "{name|{b}: {c} {d}%} \n",
             minMargin: 1,
             edgeDistance: 1,
             lineHeight: 1,
@@ -484,29 +495,38 @@ export default {
     this.myChart3 = echarts.init(main3);
     let main = this.$refs.main;
     this.myChart = echarts.init(main);
-    this.show();
-    this.show1();
-    this.show2();
-    this.show3();
-    this.show4();
+    // this.show();
+    // this.show1();
+    // this.show2();
+    // this.show3();
+    // this.show4();
+    this.into();
   },
   created() {
-    this.into();
+    this.search = this.$store.state.group;
+    this.res2.forEach(item => {
+      if (this.setOption.indexOf(item.分组) == -1) {
+        this.setOption.push(item.分组);
+      }
+    });
   }
 };
 </script>
 
 <style scoped lang='less'>
 .input {
+  margin-top: 30px;
   display: flex;
-  justify-content: end;
-  margin: 20px;
-  .active {
-    color: aqua;
-  }
-  span {
-    cursor: pointer;
-    margin-left: 10px;
+  justify-content: space-between;
+
+  div {
+    .active {
+      color: aqua;
+    }
+    span {
+      cursor: pointer;
+      margin-left: 10px;
+    }
   }
 }
 .action {

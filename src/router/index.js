@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-
+import Login from '../views/login.vue'
 Vue.use(VueRouter)
 //获取原型对象上的push函数
 const originalPush = VueRouter.prototype.push
@@ -12,6 +12,11 @@ VueRouter.prototype.push = function push(location) {
 const routes = [
   {
     path: '*',
+    name: 'login',
+    component: Login
+  },
+  {
+    path: '/home',
     name: 'home',
     component: HomeView,
     children: [{
@@ -27,13 +32,12 @@ const routes = [
       name: 'details',
       component: () => import('../views/DetailsCode.vue')
     }, {
-      path: "gu",
+      path: "/gu",
       name: 'gu',
       component: () => import('../views/gu.vue')
     }, {
       path: '*',
       component: () => import('../views/AboutView.vue')
-
     }]
   },
 ]
