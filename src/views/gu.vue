@@ -652,7 +652,7 @@ export default {
       }
       function nodeMap () {
         return nodes.map((item) => {
-          console.log(item, 'item')
+
           const obj = {
             ...item
           }
@@ -694,9 +694,9 @@ export default {
               color: "source",
               curveness: 0.4
             },
-            emphasis: {
-              focus: "adjacency"
-            },
+            // emphasis: {
+            //   focus: "adjacency"
+            // },
             itemStyle: {
               color: "#1f77b4",
               borderColor: "#1f77b4"
@@ -788,7 +788,7 @@ export default {
   },
   mounted () {
     this.show()
-    console.log(_)
+
   }
 };
 </script>

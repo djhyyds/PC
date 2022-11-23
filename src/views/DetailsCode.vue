@@ -6,7 +6,7 @@
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
           <el-select
-            style="width:130px"
+            style="width: 130px"
             @change="onSubmit"
             v-model="formInline.region"
             placeholder="风险级别"
@@ -29,7 +29,7 @@
             ref="myCascadeRef"
           >
             <template slot-scope="{ node, data }">
-              <div @click="()=>onItemClick(node,data)">
+              <div @click="() => onItemClick(node, data)">
                 <span>{{ data.label }}</span>
                 <!-- <span v-if="!node.isLeaf">({{ data.children.length }})</span> -->
               </div>
@@ -37,66 +37,148 @@
           </el-cascader>
         </el-form-item>
         <el-form-item>
-          <el-select v-model="search" filterable clearable @change="onSearch" placeholder="请输入公司名称">
-            <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
+          <el-select
+            v-model="search"
+            filterable
+            clearable
+            @change="onSearch"
+            placeholder="请输入公司名称"
+          >
+            <el-option
+              v-for="item in setOption"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item v-if="this.$store.state.show">
+          <el-select
+            v-model="search2"
+            filterable
+            clearable
+            @change="onSearch"
+            placeholder="请选择分组"
+          >
+            <el-option
+              v-for="item in setOption2"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="value2"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+            value-format="timestamp"
+            :default-time="['00:00:00', '23:59:59']"
+            @change="DateTime()"
+          >
+          </el-date-picker>
+        </el-form-item>
       </el-form>
-      <div>
-        动态时间：
-        <span @click="DateTime(86400)" :class="date==86400?'active':''">今天</span>
-        <span @click="DateTime(604800)" :class="date==604800?'active':''">近7天</span>
-        <span @click="DateTime(2592000)" :class="date==2592000?'active':''">近30天</span>
-      </div>
+
+      <!-- 动态时间： -->
+      <!-- <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
+          >今天</span
+        > -->
+      <!-- <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''"
+          >近7天</span
+        >
+        <span
+          @click="DateTime(2592000)"
+          :class="date == 2592000 ? 'active' : ''"
+          >近30天</span
+        > -->
     </div>
     <div class="content">
       <span>
         为你找到
-        <span class="active">{{tableCopeTableList.length}}</span> 条监控动态
+        <span class="active">{{ tableCopeTableList.length }}</span> 条监控动态
       </span>
-      <el-table :data="tableData" border style="width: 100%;margin-top:20px" height="590px">
-        <el-table-column fixed label="监控主体" min-width="200" header-align="center">
+      <el-table
+        :data="tableData"
+        border
+        style="width: 100%; margin-top: 20px"
+        height="590px"
+      >
+        <el-table-column
+          prop="日期"
+          label="更新时间"
+          width="150"
+          align="center"
+        ></el-table-column>
+        <el-table-column label="监控主体" min-width="200" header-align="center">
           <template slot-scope="scope">
-            <el-link type="primary" :underline="false">{{ scope.row['公司']}}</el-link><br>
-            <el-link type="warning" :underline="false">历史监控动态</el-link>
+            <el-link type="primary" :underline="false">{{
+              scope.row["公司"]
+            }}</el-link
+            ><br />
+            <!-- <el-link type="warning" :underline="false">历史监控动态</el-link> -->
           </template>
         </el-table-column>
         <el-table-column label="风险级别" min-width="80" align="center">
           <template slot-scope="scope">
             <el-link
-              v-if="scope.row['等级']=='警示'"
+              v-if="scope.row['等级'] == '警示'"
               type="warning"
               :underline="false"
-            >{{ scope.row['等级']+'信息'}}</el-link>
+              >{{ scope.row["等级"] + "信息" }}</el-link
+            >
             <el-link
-              v-else-if="scope.row['等级']=='利好'"
+              v-else-if="scope.row['等级'] == '利好'"
               type="success"
               :underline="false"
-            >{{ scope.row['等级']+'信息'}}</el-link>
+              >{{ scope.row["等级"] + "信息" }}</el-link
+            >
             <el-link
-              v-else-if="scope.row['等级']=='高风险'"
+              v-else-if="scope.row['等级'] == '高风险'"
               type="danger"
               :underline="false"
-            >{{ scope.row['等级']+'信息'}}</el-link>
-            <span style="color:#AA77CC;" v-else>{{ scope.row['等级']+'信息'}}</span>
+              >{{ scope.row["等级"] + "信息" }}</el-link
+            >
+            <span style="color: #aa77cc" v-else>{{
+              scope.row["等级"] + "信息"
+            }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="类型" label="动态类型" width="120"></el-table-column>
-        <el-table-column label="动态内容" prop="详情" min-width="400" header-align="center">
-          <!-- <template slot-scope="scope">
-            <el-popover
-              placement="top-start"
-              title="标题"
-              width="200"
-              trigger="hover"
-              :content="scope.row.详情"
-            >
-              <span slot="reference">{{scope.row.详情}}</span>
-            </el-popover>
-          </template>-->
+        <el-table-column
+          prop="类型"
+          label="动态类型"
+          width="120"
+        ></el-table-column>
+        <el-table-column label="动态内容" min-width="200" header-align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.详情 }}</span>
+            <!-- <el-link @click="open(scope.row.备注)" type="primary">详情</el-link> -->
+          </template>
         </el-table-column>
-        <el-table-column prop="日期" label="更新时间" width="150" align="center"></el-table-column>
-        <el-table-column prop="分组" label="监控分组" width="120" align="center"></el-table-column>
+        <el-table-column label="动态详情" min-width="200" header-align="center">
+          <template slot-scope="scope">
+            <span ref="bei">{{ bei(scope.row.备注) }}</span>
+            <el-link
+              v-if="scope.row.备注.length > 70"
+              @click="open(scope.row.备注)"
+              type="primary"
+              >详情</el-link
+            >
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          prop="分组"
+          label="监控分组"
+          width="120"
+          align="center"
+        ></el-table-column>
       </el-table>
     </div>
     <el-pagination
@@ -108,49 +190,96 @@
       layout="prev, pager, next"
       :total="tableCopeTableList.length"
     ></el-pagination>
+    <el-dialog
+      title="详情"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <span>{{ diaText }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-function findAllParent(node) {
+function findAllParent (node) {
   if (node.parent) {
-    const arr = findAllParent(node.parent);
-    arr.push(node.data.value);
-    return arr;
+    const arr = findAllParent(node.parent)
+    arr.push(node.data.value)
+    return arr
   } else {
-    return [node.data.value];
+    return [node.value]
   }
 }
-function filter(a, b, c, d, e, data) {
+const filter = (a, b, c, d, e, f, g, data) => {
   return data.filter(item => {
-    let bool = true;
-    let bool2 = true;
-    let bool3 = true;
-    let bool4 = true;
-    let bool5 = true;
+    let bool = true
+    let bool2 = true
+    let bool3 = true
+    let bool4 = true
+    let bool5 = true
+    let bool6 = true
+    let bool7 = true
     if (a) {
-      bool = item.等级 === a;
+      bool = item.等级 === a
     }
     if (b) {
-      bool2 = item.类型 === b;
+      bool2 = item.类型 === b
     }
     if (c) {
-      bool3 = item.风险维度 === c;
+      bool3 = item.风险维度 === c
     }
-    if (d) {
-      bool4 = item.公司 === d;
+    if (d && d != '全部') {
+      bool4 = item.公司 === d
     }
     if (e) {
-      bool5 = 1666972800 - item.时间戳 <= e;
+      bool5 = item.时间戳 * 1000 >= e[0] && item.时间戳 * 1000 <= e[1]
     }
-    return bool && bool2 && bool3 && bool4 && bool5;
-  });
+    if (g && g == '投后') {
+      bool7 = item.分组.substr(0, 1) === '投'
+    }
+    if (f && f != '全部') {
+      if (f.length > 5) { bool6 = item.分组 === f } else {
+        bool6 = item.分组.substr(0, 1) === f.substr(0, 1)
+      }
+    }
+    return bool && bool2 && bool3 && bool4 && bool5 && bool6 && bool7
+  })
 }
 export default {
-  data() {
+  data () {
     return {
+      value2: '',
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(1669046400000 - 3600 * 1000 * 24 * 7)
+     
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(1669046400000 - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      },
+      diaText: '', dialogVisible: false,
       date: this.$store.state.date,
-      setOption: [],
+      setOption: ['全部'],
+      setOption2: this.$store.state.setOption,
+      search2: this.$store.state.search,
       search: "",
       input: "",
       formInline: {
@@ -185,7 +314,6 @@ export default {
         {
           label: "工商风险",
           value: "工商风险",
-
           children: [
             // { label: " 全部", value: "工商风险" },
             { label: "股权变更", value: "股权变更" },
@@ -263,23 +391,39 @@ export default {
       ],
       tableData: [],
       tableCopeTableList: [],
-      pageSize: 8,
+      pageSize: 10,
       currentPage: 1,
       risk: "",
       res: "",
-      result: ""
-    };
+      result: "",
+      showBei: false
+    }
   },
   methods: {
-    DateTime(a) {
-      this.$store.commit("DateChange", a);
-      this.date = this.$store.state.date;
-      this.into();
+    bei (a) {
+      if (a.length > 70) {
+        this.showBei = true
+        return a.substr(0, 70) + '...'
+      } return a
     },
-    onItemClick(node) {
-      this.$refs.myCascadeRef.dropDownVisible = false;
+    handleClose () {
+      this.dialogVisible = false
+    },
+    open (a) {
+      this.dialogVisible = true
+      this.diaText = a
+    },
+    DateTime () {
+    
+      // this.$store.commit("DateChange", a)
+      // this.date = this.$store.state.date
+      this.into()
+    },
+    onItemClick (node) {
+
+      this.$refs.myCascadeRef.dropDownVisible = false
       // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
-      this.value = findAllParent(node);
+      this.value = findAllParent(node)
 
       // let res2 = this.res;
       // if (node.level == 1) {
@@ -295,30 +439,31 @@ export default {
       //     item => item["类型"] == node.value
       //   );
       // }
-      this.into();
+      this.into()
     },
-    handleSizeChange(pageSize) {
-      this.pageSize = pageSize;
-      this.tableData = this.currentChangePage(pageSize, this.currentPage);
+    handleSizeChange (pageSize) {
+      this.pageSize = pageSize
+      this.tableData = this.currentChangePage(pageSize, this.currentPage)
     },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage;
-      this.tableData = this.currentChangePage(this.pageSize, currentPage);
+    handleCurrentChange (currentPage) {
+      this.currentPage = currentPage
+      this.tableData = this.currentChangePage(this.pageSize, currentPage)
     },
     //分页方法
-    currentChangePage(size, current) {
-      const tablePush = [];
+    currentChangePage (size, current) {
+      const tablePush = []
       this.tableCopeTableList.forEach((item, index) => {
         if (size * (current - 1) <= index && index <= size * current - 1) {
-          tablePush.push(item);
+          tablePush.push(item)
         }
-      });
-      return tablePush;
+      })
+      return tablePush
     },
-    onSubmit() {
-      this.into();
+    onSubmit () {
+      this.currentPage = 1
+      this.into()
     },
-    into() {
+    into () {
       // if (this.value.length == 1) {
       //   this.res = this.res.filter(item => item["风险维度"] == this.value[0]);
       // } else if (this.value.length == 2) {
@@ -332,17 +477,21 @@ export default {
       //     item => item[this.result] == this.risk
       //   );
       // }
-      this.setOption = [];
-      this.risk = this.formInline.region;
-      let b, c;
+      this.currentPage = 1
+      this.setOption = ['全部']
+      // this.setOption2 = ['全部']
+      this.risk = this.formInline.region
+      let b, c
+
+
       if (Array.isArray(this.value)) {
         if (this.value.length == 1) {
-          c = this.value[0];
+          c = this.value[0]
         } else {
-          b = this.value[1];
+          b = this.value[1]
         }
       } else {
-        c = this.value;
+        c = this.value
       }
 
       this.tableCopeTableList = filter(
@@ -350,15 +499,20 @@ export default {
         b,
         c,
         this.search,
-        this.date,
+        this.value2,
+        this.search2,
+        this.$store.state.th,
         this.res
-      );
-      this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
+      )
+      this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
       this.tableCopeTableList.forEach(item => {
         if (this.setOption.indexOf(item.公司) == -1) {
-          this.setOption.push(item.公司);
+          this.setOption.push(item.公司)
         }
-      });
+        // if (this.setOption2.indexOf(item.分组) == -1) {
+        //   this.setOption2.push(item.分组)
+        // }
+      })
 
     },
     // fuzzySearch(list, search) {
@@ -375,22 +529,36 @@ export default {
     //   this.tableCopeTableList = data;
     //   this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
     // },
-    onSearch() {
-      this.into();
+    onSearch () {
+      this.$store.commit("SearchChange", this.search2)
+      this.into()
     }
   },
-  created() {
-    this.res = this.$store.state.res;
-    this.formInline.region = this.$route.params.a;
-    this.value = this.$route.params.b;
+  created () {
 
-    // this.result = this.$route.params.result;
-    this.into();
+    this.res = this.$store.state.res
+    this.formInline.region = this.$route.params.a
+    if (this.$route.params.name) {
+      this.value = [0, this.$route.params.name]
+    } else if (this.$route.params.b) {
+      this.value = this.$route.params.b
+    }
+    if (this.date == 2592000) {
+      this.value2 = [1669046400000 - 30 * 86400000, 1669046400000]
+    } else {
+      this.value2 = [1669046400000 - 7 * 86400000, 1669046400000]
+    }
+    this.into()
+
+
   },
-  beforeMount() {
+  beforeMount () {
     // if(this.risk=='')
     // this.tableCopeTableList = this.$store.state.res;
-    this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
+    this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
+  },
+  mounted () {
+
   }
 };
 </script>

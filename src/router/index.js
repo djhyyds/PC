@@ -6,24 +6,29 @@ Vue.use(VueRouter)
 //获取原型对象上的push函数
 const originalPush = VueRouter.prototype.push
 //修改原型对象中的push方法
-VueRouter.prototype.push = function push(location) {
+VueRouter.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 const routes = [
   {
-    path: '*',
+    path: '/big',
+    name: "big",
+    component: () => import('../views/bigScreen/home.vue'),
+  },
+  {
+    path: '',
     name: 'home',
     component: HomeView,
     children: [{
-      path: '/about',
+      path: '',
       name: 'about',
       component: () => import('../views/AboutView.vue')
     }, {
-      path: '/risk',
+      path: 'risk',
       name: 'risk',
       component: () => import('../views/RiskLevel.vue')
     }, {
-      path: '/details',
+      path: 'details',
       name: 'details',
       component: () => import('../views/DetailsCode.vue')
     }, {
@@ -33,11 +38,17 @@ const routes = [
     }, {
       path: '*',
       component: () => import('../views/AboutView.vue')
-
     }]
   },
+  {
+    path: '/sss',
+    component: () => import('../views/404.vue')
+  },
+  {
+    path: '*',
+    component: () => import('../views/404.vue')
+  },
 ]
-
 const router = new VueRouter({
   routes
 })

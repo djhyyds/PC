@@ -3,11 +3,27 @@
     <h3>风险级别</h3>
     <hr />
     <div class="input">
+      <el-select
+        v-if="this.$store.state.show"
+        v-model="search2"
+        filterable
+        clearable
+        @change="onSearch"
+        placeholder="请选择分组"
+      >
+        <el-option
+          v-for="item in setOption2"
+          :key="item"
+          :label="item"
+          :value="item"
+        ></el-option>
+      </el-select>
+      <div v-else></div>
       <div>
         动态时间：
-        <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
+        <!-- <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
           >今天</span
-        >
+        > -->
         <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''"
           >近7天</span
         >
@@ -65,6 +81,8 @@ export default {
     return {
       date: "",
       input: "",
+      setOption2: ['全部'],
+      search2: '',
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
       res2: this.$store.state.res,
       res: "",
@@ -73,13 +91,31 @@ export default {
       myChart1: "",
       myChart2: "",
       myChart3: "",
-      myChart4: ""
+      myChart4: "",
+      ECres: this.$store.state.ECres
     }
   },
   methods: {
+    onSearch () {
+      this.$store.commit("SearchChange", this.search2)
+      this.into()
+    },
     into () {
+      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 }
+
       this.res = this.res2.filter(
-        item => 1666972800 - item.时间戳 <= this.date
+        item => {
+          if (this.search2 && this.search2 != '全部') {
+            if (this.search2.length < 3) {
+              return 1669046400000 / 1000 - item.时间戳 <= this.date && item.分组.substr(0, 1) == this.search2.substr(0, 1)
+            } else {
+              return 1669046400000 / 1000 - item.时间戳 <= this.date && item.分组 == this.search2
+            }
+          } else {
+            return 1669046400000 / 1000 - item.时间戳 <= this.date
+          }
+
+        }
       )
       this.res.forEach(item => {
         if (this.result[item["等级"]]) {
@@ -88,17 +124,16 @@ export default {
           this.result[item["等级"]] = 1
         }
       })
-    },
-    DateTime (a) {
-
-      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 }
-      this.$store.commit("DateChange", a)
-      this.date = this.$store.state.date
-      this.into()
       this.show()
       this.show1()
       this.show2()
       this.show3()
+      this.show4()
+    },
+    DateTime (a) {
+      this.$store.commit("DateChange", a)
+      this.date = this.$store.state.date
+      this.into()
     },
     filter (a) {
       this.$router.push({
@@ -343,80 +378,142 @@ export default {
       option && this.myChart3.setOption(option)
     },
     show4 () {
-      let main4 = this.$refs.main4
-      let myChart4 = echarts.init(main4)
       var option
-      setTimeout(function () {
-        option = {
-          legend: {},
-          tooltip: {
-            trigger: "axis"
-          },
-          dataset: {
-            source: [
-              ["", "2022-13-13", "23-12-12", "31-12"],
-              ["提示", 56.5, 82.1, 88.7, 70.1, 53.4, 85.1],
-              ["利好", 51.1, 51.4, 55.1, 53.3, 73.8, 68.7],
-              ["警示", 20.1, 62.2, 69.5, 36.4, 45.2, 32.5],
-              ["高风险", 25.2, 37.1, 41.2, 18, 33.9, 49.1]
-            ]
-          },
-          xAxis: { type: "category", boundaryGap: false },
-          yAxis: { gridIndex: 0 },
-          grid: { top: "20%" },
-          series: [
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              symbol: "none",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              symbol: "none",
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
+      let a, b = true
+      a = this.date == 604800 ? 7 : 30
+      let s = this.ECres.find(
+        item => {
+
+          if (this.search2 && this.search2 != '全部') {
+            b = item.group === this.search2
+          } else {
+            if (item.group == 'all') { b = item.group == 'all' }
+            else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
+              b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
+            } else {
+              b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
             }
-          ]
+          }
+
+          return item['source_' + a] && b
         }
-        myChart4.on("updateAxisPointer", function (event) {
-          const xAxisInfo = event.axesInfo[0]
-          if (xAxisInfo) {
-            const dimension = xAxisInfo.value + 1
-            myChart4.setOption({
-              series: {
-                id: "pie",
+      )
+
+      option = {
+        legend: {},
+        tooltip: {
+          trigger: "axis"
+        },
+        dataset: {
+          source: s['source_' + a]
+        },
+        xAxis: { type: "category", boundaryGap: false },
+        yAxis: { gridIndex: 0 },
+        grid: { top: "20%" },
+        series: [
+          {
+            type: "line",
+            smooth: true,
+            seriesLayoutBy: "row",
+            // symbol: "none",
+            symbolSize: 5,//一定要加这个字段才能显示
+            itemStyle: {
+              normal: {
                 label: {
-                  formatter: "{b}: {@[" + dimension + "]} ({d}%)"
-                },
-                encode: {
-                  value: dimension,
-                  tooltip: dimension
+                  show: true,
+                  position: 'top',
+                  fontSize: 13,
+                  textStyle: {
+                    color: 'auto'
+                  }
                 }
               }
-            })
-          }
-        })
-        myChart4.setOption(option)
-      })
+            },
 
-      option && myChart4.setOption(option)
+
+            emphasis: { focus: "series" }
+          },
+          {
+            type: "line",
+            smooth: true,
+            // symbol: "none",
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 5,//一定要加这个字段才能显示
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  position: 'top',
+                  fontSize: 13,
+                  textStyle: {
+                    color: 'auto'
+                  }
+                }
+              }
+            },
+          },
+          {
+            type: "line",
+            smooth: true,
+            // symbol: "none",
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 5,//一定要加这个字段才能显示
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  position: 'top',
+                  fontSize: 13,
+                  textStyle: {
+                    color: 'auto'
+                  }
+                }
+              }
+            },
+          },
+          {
+            type: "line",
+            smooth: true,
+            // symbol: "none",
+            seriesLayoutBy: "row",
+            emphasis: { focus: "series" },
+            symbolSize: 5,//一定要加这个字段才能显示
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  position: 'top',
+                  fontSize: 13,
+                  textStyle: {
+                    color: 'auto'
+                  }
+                }
+              }
+            },
+          }
+        ]
+      }
+      // this.myChart4.on("updateAxisPointer", function (event) {
+      //   const xAxisInfo = event.axesInfo[0]
+      //   if (xAxisInfo) {
+      //     const dimension = xAxisInfo.value + 1
+      //     this.myChart4.setOption({
+      //       series: {
+      //         id: "pie",
+      //         label: {
+      //           formatter: "{b}: {@[" + dimension + "]} ({d}%)"
+      //         },
+      //         encode: {
+      //           value: dimension,
+      //           tooltip: dimension
+      //         }
+      //       }
+      //     })
+      //   }
+      // })
+      this.myChart4.setOption(option)
     }
   },
   mounted () {
@@ -428,15 +525,24 @@ export default {
     this.myChart3 = echarts.init(main3)
     let main = this.$refs.main
     this.myChart = echarts.init(main)
-    this.show()
-    this.show1()
-    this.show2()
-    this.show3()
-    this.show4()
+    let main4 = this.$refs.main4
+    this.myChart4 = echarts.init(main4)
+    this.into()
   },
   created () {
     this.date = this.$store.state.date
-    this.into()
+    this.res2.forEach(item => {
+      if (this.setOption2.indexOf(item.分组) == -1) {
+        this.setOption2.push(item.分组)
+      }
+    })
+    if (this.$store.state.search == '全部') {
+      this.$store.commit("showChange", this.setOption2)
+
+    }
+
+    this.setOption2 = this.$store.state.setOption
+    this.search2 = this.$store.state.search
   }
 };
 </script>
@@ -445,7 +551,7 @@ export default {
 .about {
   .input {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     margin: 20px;
     .active {
       color: aqua;
@@ -476,6 +582,7 @@ export default {
         div {
           font-size: 12px;
           font-weight: 100;
+          cursor: pointer;
         }
         span {
           display: block;
