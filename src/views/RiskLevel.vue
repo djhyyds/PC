@@ -1,6 +1,6 @@
 <template>
   <div class="risk">
-    <h3>风险维度</h3>
+    <h2>风险维度</h2>
     <hr />
     <div class="input">
       <el-select

@@ -1,6 +1,6 @@
 <template>
   <div class="details">
-    <h3>监控动态</h3>
+    <h2>监测动态</h2>
     <hr />
     <div class="input">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
@@ -102,7 +102,7 @@
     <div class="content">
       <span>
         为你找到
-        <span class="active">{{ tableCopeTableList.length }}</span> 条监控动态
+        <span class="active">{{ tableCopeTableList.length }}</span> 条监测动态
       </span>
       <el-table
         :data="tableData"
@@ -116,13 +116,13 @@
           width="150"
           align="center"
         ></el-table-column>
-        <el-table-column label="监控主体" min-width="200" header-align="center">
+        <el-table-column label="监测主体" min-width="200" header-align="center">
           <template slot-scope="scope">
             <el-link type="primary" :underline="false">{{
               scope.row["公司"]
             }}</el-link
             ><br />
-            <!-- <el-link type="warning" :underline="false">历史监控动态</el-link> -->
+            <!-- <el-link type="warning" :underline="false">历史监测动态</el-link> -->
           </template>
         </el-table-column>
         <el-table-column label="风险级别" min-width="80" align="center">
@@ -175,7 +175,7 @@
 
         <el-table-column
           prop="分组"
-          label="监控分组"
+          label="监测分组"
           width="120"
           align="center"
         ></el-table-column>
@@ -262,7 +262,7 @@ export default {
             const end = new Date()
             const start = new Date()
             start.setTime(1669046400000 - 3600 * 1000 * 24 * 7)
-     
+
             picker.$emit('pick', [start, end])
           }
         }, {
@@ -414,7 +414,7 @@ export default {
       this.diaText = a
     },
     DateTime () {
-    
+
       // this.$store.commit("DateChange", a)
       // this.date = this.$store.state.date
       this.into()
@@ -425,20 +425,7 @@ export default {
       // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
       this.value = findAllParent(node)
 
-      // let res2 = this.res;
-      // if (node.level == 1) {
-      //   if (this.value[0] == "total") {
-      //     this.tableCopeTableList = this.res2;
-      //   } else {
-      //     this.tableCopeTableList = res2.filter(
-      //       item => item["风险维度"] == node.value
-      //     );
-      //   }
-      // } else {
-      //   this.tableCopeTableList = res2.filter(
-      //     item => item["类型"] == node.value
-      //   );
-      // }
+
       this.into()
     },
     handleSizeChange (pageSize) {
@@ -464,19 +451,7 @@ export default {
       this.into()
     },
     into () {
-      // if (this.value.length == 1) {
-      //   this.res = this.res.filter(item => item["风险维度"] == this.value[0]);
-      // } else if (this.value.length == 2) {
-      //   this.res = this.res.filter(item => item["类型"] == this.value[1]);
-      // }
-      // if (this.risk == "total") {
-      //   this.tableCopeTableList = this.res;
-      // } else {
-      //   if (this.result == "等级") this.formInline.region = this.risk;
-      //   this.tableCopeTableList = this.res.filter(
-      //     item => item[this.result] == this.risk
-      //   );
-      // }
+
       this.currentPage = 1
       this.setOption = ['全部']
       // this.setOption2 = ['全部']
@@ -515,20 +490,7 @@ export default {
       })
 
     },
-    // fuzzySearch(list, search) {
-    //   let data = [];
-    //   if (list.length != 0 && search) {
-    //     let str = `\S*${search}\S*`;
-    //     let reg = new RegExp(str);
-    //     list.map(item => {
-    //       if (reg.test(item["公司"])) {
-    //         data.push(item);
-    //       }
-    //     });
-    //   }
-    //   this.tableCopeTableList = data;
-    //   this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
-    // },
+
     onSearch () {
       this.$store.commit("SearchChange", this.search2)
       this.into()
@@ -538,6 +500,10 @@ export default {
 
     this.res = this.$store.state.res
     this.formInline.region = this.$route.params.a
+    if (this.$route.params.GSname) {
+      this.search = this.$route.params.GSname
+      console.log(this.$route.params.GSname)
+    }
     if (this.$route.params.name) {
       this.value = [0, this.$route.params.name]
     } else if (this.$route.params.b) {
@@ -553,8 +519,7 @@ export default {
 
   },
   beforeMount () {
-    // if(this.risk=='')
-    // this.tableCopeTableList = this.$store.state.res;
+
     this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
   },
   mounted () {

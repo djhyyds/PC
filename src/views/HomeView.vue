@@ -19,7 +19,10 @@
             <el-menu-item
               index="3"
               @click="$router.push({ name: 'details', params: { a: '' } })"
-              >监控动态</el-menu-item
+              >监测动态</el-menu-item
+            >
+            <el-menu-item index="6" @click="$router.push({ name: 'list' })"
+              >监测列表</el-menu-item
             >
           </el-submenu>
           <!-- <el-menu-item  index="4" @click="$router.push({ path: 'gu' })"

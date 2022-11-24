@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import res from "../../public/jsonData/thData/web_info_投后-ALL.json"
-import ECres from '../../public/jsonData/thData/web_data_投后-ALL.json'
+// import res from "../../public/jsonData/thData/web_info_投后-ALL.json"
+// import ECres from '../../public/jsonData/thData/web_data_投后-ALL.json'
 // import res from "../../public/jsonData/cgData/web_info_采购-ALL.json"
 // import ECres from '../../public/jsonData/cgData/web_data_采购-ALL.json'
 // import res from "../../public/jsonData/rfData/web_info_人法动态.json"
 // import ECres from '../../public/jsonData/rfData/web_data_人法动态.json'
 // import res from "../../public/jsonData/skData/web_info_数科-教育场景.json"
 // import ECres from '../../public/jsonData/skData/web_data_数科-教育场景.json'
-// import res from "../../public/jsonData/allData/web_info_all.json"
-// import ECres from '../../public/jsonData/allData/web_data_all.json'
+import res from "../../public/jsonData/allData/web_info_all.json"
+import ECres from '../../public/jsonData/allData/web_data_all.json'
 import settings from './moudles/settings'
 import json from '../../public/jsonData/index.json'
 Vue.use(Vuex)

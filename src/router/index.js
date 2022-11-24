@@ -36,6 +36,10 @@ const routes = [
       name: 'gu',
       component: () => import('../views/gu.vue')
     }, {
+      path: "list",
+      name: 'list',
+      component: () => import('../views/MonitoringList.vue')
+    }, {
       path: '*',
       component: () => import('../views/AboutView.vue')
     }]
