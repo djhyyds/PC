@@ -3,7 +3,7 @@
     <h2>监测列表</h2>
     <hr />
     <div class="input">
-      <el-select
+      <!-- <el-select
         v-model="search2"
         filterable
         clearable
@@ -16,8 +16,20 @@
           :label="item"
           :value="item"
         ></el-option>
-      </el-select>
+      </el-select> -->
+      <div class="btn">
+        <button
+          :class="setOption2.find((a) => a == item[0]) ? 'active' : ''"
+          @click="btnClick(item)"
+          size="mini"
+          v-for="(item, index) in sum"
+          :key="index"
+        >
+          {{ item[0] + "(" + item[1] + ")" }}
+        </button>
+      </div>
       <el-select
+        style="width: 300px; margin-top: 10px"
         v-model="search"
         filterable
         clearable
@@ -52,7 +64,7 @@
               <el-link
                 type="warning"
                 :underline="false"
-                @click="jump(scope.row['企业名称'])"
+                @click="jump(scope.row['企业名称'], scope.row['监测分组'])"
                 >查看历史监测动态></el-link
               >
             </div>
@@ -64,12 +76,13 @@
           min-width="50"
           align="center"
         ></el-table-column>
-        <el-table-column
-          prop="监测分组"
-          label="监测分组"
-          min-width="70"
-          align="center"
-        ></el-table-column>
+        <el-table-column label="监测分组" min-width="70" align="center"
+          ><template slot-scope="scope">
+            <span class="type" @click="jump('', scope.row['监测分组'])">{{
+              scope.row["监测分组"]
+            }}</span>
+          </template></el-table-column
+        >
       </el-table>
     </div>
     <el-pagination
@@ -85,7 +98,8 @@
 </template>
 
 <script>
-import res from '../../public/jsonData/all_qy_20221124.json'
+
+
 export default {
   data () {
     return {
@@ -95,35 +109,49 @@ export default {
       currentPage: 1,
       search2: '',
       search: '',
-      res: [],
-      setOption2: ['全部'],
+      res: this.$store.state.sumList,
+      setOption2: [],
       setOption: ['全部'],
+      sum: this.$store.state.sum
     }
   },
   methods: {
-    jump (a) {
+    jump (a, b) {
       this.$router.push({
         name: 'details', params: {
-          GSname: a
+          GSname: a,
+          type: b
         }
       })
 
 
+    },
+    btnClick (a) {
+      if (a[0] == 'ALL') {
+        this.setOption2 = ['ALL']
+      } else {
+        this.setOption2 = this.setOption2.filter(item => item != 'ALL')
+        if (this.setOption2.indexOf(a[0]) != -1) { this.setOption2 = this.setOption2.filter(item => item != a[0]) } else {
+          this.setOption2.push(a[0])
+        }
+      }
+      this.onSearch()
     },
     onSearch () {
       this.setOption = ['全部']
       this.tableData = this.res
       this.tableData = this.tableData.filter(item => {
         let a = true, b = true
-        if (this.search2 && this.search2 != '全部') {
-          b = item.监测分组 == this.search2
+        if (this.setOption2.length != 0 && this.setOption2.indexOf('ALL') == -1) {
+          b = this.setOption2.find(a => a == item.监测分组)
         }
         if (this.search && this.search != '全部') {
           a = item.企业名称 == this.search
         }
+
         return a && b
       })
-      console.log(this.tableData, this.search2)
+      console.log(this.tableData, this.setOption2)
       this.tableData.forEach(item => {
         if (this.setOption.indexOf(item.企业名称) == -1) {
           this.setOption.push(item.企业名称)
@@ -152,16 +180,15 @@ export default {
     },
   },
   created () {
-    this.res = res.filter(item => {
-      return this.$store.state.ECres.some(a => a.group === item.监测分组)
-    })
-    
+    this.sum = this.sum.sort((a, b) => b[1] - a[1])
+    // this.res = res.filter(item => {
+    //   return this.$store.state.ECres.some(a => a.group === item.监测分组)
+    // })
+
+
     this.tableData = this.res
     this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
     this.tableData.forEach(item => {
-      if (this.setOption2.indexOf(item.监测分组) == -1) {
-        this.setOption2.push(item.监测分组)
-      }
       if (this.setOption.indexOf(item.企业名称) == -1) {
         this.setOption.push(item.企业名称)
       }
@@ -171,8 +198,42 @@ export default {
 </script>
 
 <style lang='less' scoped>
+.type {
+  cursor: pointer;
+  color: rgb(0, 123, 255);
+}
 .input {
+  .btn {
+    display: flex;
+    flex-wrap: wrap;
+    width: 900px;
+    .active {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+    button {
+      font-size: 12px;
+      border-radius: 3px;
+      padding: 7px 15px;
+      margin: 5px;
+      display: inline-block;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #dcdfe6;
+      color: #606266;
+      -webkit-appearance: none;
+      text-align: center;
+      box-sizing: border-box;
+      outline: 0;
+      transition: 0.1s;
+      font-weight: 500;
+    }
+  }
   display: flex;
+  flex-direction: column;
   margin: 20px;
   .el-select {
     margin-right: 10px;

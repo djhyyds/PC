@@ -107,12 +107,12 @@ export default {
         item => {
           if (this.search2 && this.search2 != '全部') {
             if (this.search2.length < 3) {
-              return 1669046400000 / 1000 - item.时间戳 <= this.date && item.分组.substr(0, 1) == this.search2.substr(0, 1)
+              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组.substr(0, 1) == this.search2.substr(0, 1)
             } else {
-              return 1669046400000 / 1000 - item.时间戳 <= this.date && item.分组 == this.search2
+              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组 == this.search2
             }
           } else {
-            return 1669046400000 / 1000 - item.时间戳 <= this.date
+            return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date
           }
 
         }

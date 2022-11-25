@@ -104,6 +104,11 @@
         为你找到
         <span class="active">{{ tableCopeTableList.length }}</span> 条监测动态
       </span>
+      &nbsp;
+      <span>
+        共涉及
+        <span class="active">{{ setOption.length - 1 }}</span> 家企业
+      </span>
       <el-table
         :data="tableData"
         border
@@ -254,6 +259,7 @@ const filter = (a, b, c, d, e, f, g, data) => {
 export default {
   data () {
     return {
+
       value2: '',
       pickerOptions: {
         shortcuts: [{
@@ -261,7 +267,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669046400000 - 3600 * 1000 * 24 * 7)
+            start.setTime(this.$store.state.nowDate - 3600 * 1000 * 24 * 7)
 
             picker.$emit('pick', [start, end])
           }
@@ -270,7 +276,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669046400000 - 3600 * 1000 * 24 * 30)
+            start.setTime(this.$store.state.nowDate - 3600 * 1000 * 24 * 30)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -502,7 +508,9 @@ export default {
     this.formInline.region = this.$route.params.a
     if (this.$route.params.GSname) {
       this.search = this.$route.params.GSname
-      console.log(this.$route.params.GSname)
+    }
+    if (this.$route.params.type) {
+      this.search2 = this.$route.params.type
     }
     if (this.$route.params.name) {
       this.value = [0, this.$route.params.name]
@@ -510,9 +518,9 @@ export default {
       this.value = this.$route.params.b
     }
     if (this.date == 2592000) {
-      this.value2 = [1669046400000 - 30 * 86400000, 1669046400000]
+      this.value2 = [this.$store.state.nowDate - 30 * 86400000, this.$store.state.nowDate]
     } else {
-      this.value2 = [1669046400000 - 7 * 86400000, 1669046400000]
+      this.value2 = [this.$store.state.nowDate - 7 * 86400000, this.$store.state.nowDate]
     }
     this.into()
 

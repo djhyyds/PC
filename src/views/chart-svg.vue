@@ -8,7 +8,7 @@
         <h2>比例</h2>
       </div>
       <ul>
-        <li class="ct">
+        <li class="ct"> 
           <div>
             <span class="round"></span>
             留存
@@ -567,7 +567,8 @@ export default {
       }
     },
 
-    render (_nodes = [
+    render (
+      _nodes = [
       {
         "groups": [],
         "column": 0,
@@ -650,10 +651,10 @@ export default {
       },
       {
         "groups": [],
-        "column": 0,
+        "column": 2,
         "name": "node-5",
-        "eventName": "App 元素点击",
-        "border": 2,
+        "eventName": "App1111111 元素点击",
+        "border": 31,
         "paths": 143,
         "session": {
           "paths": 57,
@@ -4461,7 +4462,8 @@ export default {
           "ratio": "100.0000%"
         }
       }
-    ], _links = [
+    ],
+     _links = [
       {
         "from": "node-1",
         "to": "node-8",
