@@ -197,7 +197,7 @@ export default {
         series: [
           {
             type: "sankey",
-    
+
             left: 50.0,
             top: 20.0,
             right: 150.0,

@@ -79,6 +79,9 @@ import * as echarts from "echarts"
 export default {
   data () {
     return {
+      setOption: ["全部"],
+      search: "",
+      info: [],
       date: this.$store.state.date,
       ECres: this.$store.state.ECres,
       myChart: "",
@@ -478,6 +481,7 @@ export default {
 
 <style scoped lang='less'>
 .input {
+  margin-top: 30px;
   display: flex;
   justify-content: space-between;
   margin: 20px;
@@ -514,6 +518,10 @@ export default {
         cursor: pointer;
         font-size: 12px;
         font-weight: 100;
+        cursor: pointer;
+        &:hover {
+          color: aqua;
+        }
       }
       span {
         display: block;

@@ -63,6 +63,7 @@
                   scope.row["K02_企业"]
                 }}</el-link>
                 <el-tag
+                  :effect="scope.row['K11_高风险'] == 0 ? '' : 'dark'"
                   size="mini"
                   type="danger"
                   @click="
@@ -71,6 +72,7 @@
                   >高风险:{{ scope.row["K11_高风险"] }}</el-tag
                 >
                 <el-tag
+                  :effect="scope.row['K12_警示'] == 0 ? '' : 'dark'"
                   size="mini"
                   type="warning"
                   @click="
@@ -79,6 +81,7 @@
                   >警示:{{ scope.row["K12_警示"] }}</el-tag
                 >
                 <el-tag
+                  :effect="scope.row['K13_利好'] == 0 ? '' : 'dark'"
                   size="mini"
                   type="success"
                   @click="
@@ -87,6 +90,7 @@
                   >利好:{{ scope.row["K13_利好"] }}</el-tag
                 >
                 <el-tag
+                  :effect="scope.row['K14_提示'] == 0 ? '' : 'dark'"
                   size="mini"
                   @click="
                     jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
@@ -94,8 +98,9 @@
                   >提示:{{ scope.row["K14_提示"] }}</el-tag
                 >
                 <el-tag
-                  effect="dark"
+                  :effect="scope.row['K15_司法风险'] == 0 ? '' : 'dark'"
                   size="mini"
+                  type="warning"
                   @click="
                     jump(
                       scope.row['K02_企业'],
@@ -107,8 +112,9 @@
                   >司法风险:{{ scope.row["K15_司法风险"] }}</el-tag
                 >
                 <el-tag
-                  effect="dark"
+                  :effect="scope.row['K16_工商风险'] == 0 ? '' : 'dark'"
                   size="mini"
+                  type="warning"
                   @click="
                     jump(
                       scope.row['K02_企业'],
@@ -120,8 +126,9 @@
                   >工商风险:{{ scope.row["K16_工商风险"] }}</el-tag
                 >
                 <el-tag
-                  effect="dark"
+                  :effect="scope.row['K17_经营风险'] == 0 ? '' : 'dark'"
                   size="mini"
+                  type="warning"
                   @click="
                     jump(
                       scope.row['K02_企业'],
@@ -133,7 +140,7 @@
                   >经营风险:{{ scope.row["K17_经营风险"] }}</el-tag
                 >
                 <el-tag
-                  effect="dark"
+                  :effect="scope.row['K18_经营状况'] == 0 ? '' : 'dark'"
                   size="mini"
                   @click="
                     jump(

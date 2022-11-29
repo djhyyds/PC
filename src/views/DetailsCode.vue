@@ -6,12 +6,14 @@
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
           <el-select
-            style="width: 130px"
+            multiple
+            collapse-tags
+            style="width: 200px"
             @change="onSubmit"
             v-model="formInline.region"
             placeholder="风险级别"
           >
-            <el-option label="全部" value></el-option>
+            <el-option label="全部" value="全部"></el-option>
             <el-option label="高风险" value="高风险"></el-option>
             <el-option label="警示" value="警示"></el-option>
             <el-option label="提示" value="提示"></el-option>
@@ -21,9 +23,14 @@
         <el-form-item>
           <el-cascader
             v-model="value"
+            collapse-tags
             :options="options"
             :show-all-levels="false"
-            :props="{ checkStrictly: true, expandTrigger: 'hover' }"
+            :props="{
+              checkStrictly: true,
+              expandTrigger: 'hover',
+              multiple: true,
+            }"
             popper-class="myCascade"
             filterable
             ref="myCascadeRef"
@@ -56,10 +63,10 @@
           <el-select
             v-model="search2"
             filterable
-            clearable
             multiple
-            style="width: 260px"
+            clearable
             collapse-tags
+            style="width: 260px"
             @change="onSearch"
             placeholder="请选择分组"
           >
@@ -189,6 +196,13 @@
         ></el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      title="详情"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose"
+      >{{ bei }}</el-dialog
+    >
     <el-pagination
       background
       @size-change="handleSizeChange"
@@ -213,7 +227,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 function findAllParent (node) {
   if (node.parent) {
@@ -233,8 +246,8 @@ const filter = (a, b, c, d, e, f, data) => {
     let bool5 = true
     let bool6 = true
     let bool7 = true
-    if (a) {
-      bool = item.等级 === a
+    if (a.length != 0 && a.indexOf('全部') == -1) {
+      bool = a.find(q => q == item.等级)
     }
     if (b) {
       bool2 = item.类型 === b
@@ -248,7 +261,6 @@ const filter = (a, b, c, d, e, f, data) => {
     if (e) {
       bool5 = item.时间戳 * 1000 >= e[0] && item.时间戳 * 1000 <= e[1]
     }
-    console.log(e, 'eeeeeeeeee')
     if (f.length != 0 && f.indexOf('全部') == -1) {
 
       bool6 = f.find(a => a == item.分组)
@@ -428,7 +440,7 @@ export default {
     },
     onItemClick (node) {
 
-      this.$refs.myCascadeRef.dropDownVisible = false
+      this.$refs.myCascadeRef.dropDownVisible = true
       // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
       this.value = findAllParent(node)
 
@@ -454,6 +466,11 @@ export default {
       return tablePush
     },
     onSubmit () {
+      if (this.formInline.region[this.formInline.region.length - 1] == '全部' || this.formInline.region.length == 0) {
+        this.formInline.region = ['全部']
+      } else {
+        this.formInline.region = this.formInline.region.filter(item => item != '全部')
+      }
       this.currentPage = 1
       this.into()
     },
@@ -510,7 +527,9 @@ export default {
   created () {
 
     this.res = this.$store.state.res
-    this.formInline.region = this.$route.params.a
+    if (this.$route.params.a) {
+      this.formInline.region = [this.$route.params.a]
+    }
     if (this.$route.params.GSname) {
       this.search = this.$route.params.GSname
     }
@@ -538,6 +557,9 @@ export default {
   mounted () {
 
   }
+  // beforeMount() {
+  //   // this.tableData = this.currentChangePage(this.pageSize, this.currentPage);
+  // }
 };
 </script>
 <style  lang='less'>

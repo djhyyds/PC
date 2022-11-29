@@ -43,10 +43,15 @@
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    stop() {
+      this.$router.replace({ name: "login" });
+    }
+  }
+};
 </script>
-
-<style>
+<style lang='less'>
 .home {
   overflow: hidden;
   width: 100vw;

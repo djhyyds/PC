@@ -71,16 +71,17 @@
       </div>
     </div>
     <div class="code2">
-      <div id="main4" style="width: 100%; height: 300px" ref="main4"></div>
+      <div id="main4" style="width: 100%; height: 400px" ref="main4"></div>
     </div>
   </div>
 </template>
 
 <script>
-import * as echarts from "echarts"
+import * as echarts from "echarts";
 export default {
-  data () {
+  data() {
     return {
+      search: "",
       date: "",
       input: "",
       setOption2: ['全部'],
@@ -123,9 +124,9 @@ export default {
       )
       this.res.forEach(item => {
         if (this.result[item["等级"]]) {
-          this.result[item["等级"]]++
+          this.result[item["等级"]]++;
         } else {
-          this.result[item["等级"]] = 1
+          this.result[item["等级"]] = 1;
         }
       })
       if (this.res.length == 0) {
@@ -142,14 +143,14 @@ export default {
       this.date = this.$store.state.date
       this.into()
     },
-    filter (a) {
+    filter(a) {
       this.$router.push({
         name: "details",
         params: {
           result: "等级",
           a
         }
-      })
+      });
     },
     show5 () {
       let option
@@ -161,7 +162,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -206,8 +207,8 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart.setOption(option, true)
+      };
+      option && this.myChart.setOption(option, true);
     },
     show1 () {
       let option
@@ -220,7 +221,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -265,8 +266,8 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart1.setOption(option, true)
+      };
+      option && this.myChart1.setOption(option, true);
     },
     show2 () {
       let option
@@ -278,7 +279,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
       option = {
         series: [
           {
@@ -323,8 +324,8 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart2.setOption(option, true)
+      };
+      option && this.myChart2.setOption(option, true);
     },
     show3 () {
       let option
@@ -336,7 +337,7 @@ export default {
             offsetCenter: ["0%", "0%"]
           }
         }
-      ]
+      ];
 
       option = {
         series: [
@@ -383,8 +384,8 @@ export default {
             }
           }
         ]
-      }
-      option && this.myChart3.setOption(option)
+      };
+      option && this.myChart3.setOption(option);
     },
     show4 () {
       var option
@@ -628,6 +629,10 @@ export default {
           margin: 0;
         }
         div {
+          cursor: pointer;
+          &:hover {
+            color: aqua;
+          }
           font-size: 12px;
           font-weight: 100;
           cursor: pointer;
