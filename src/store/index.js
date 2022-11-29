@@ -6,10 +6,10 @@ import Vuex from 'vuex'
 // import sumList from '../../public/jsonData/thData/list_投后_info.json'
 
 
-import res from "../../public/jsonData/cgData/web_info_采购-ALL.json"
-import ECres from '../../public/jsonData/cgData/web_data_采购-ALL.json'
-import sum from '../../public/jsonData/cgData/list_采购_add.json'
-import sumList from '../../public/jsonData/cgData/list_采购_info.json'
+// import res from "../../public/jsonData/cgData/web_info_采购-ALL.json"
+// import ECres from '../../public/jsonData/cgData/web_data_采购-ALL.json'
+// import sum from '../../public/jsonData/cgData/list_采购_add.json'
+// import sumList from '../../public/jsonData/cgData/list_采购_info.json'
 
 
 // import res from "../../public/jsonData/rfData/web_info_人法动态.json"
@@ -25,10 +25,10 @@ import sumList from '../../public/jsonData/cgData/list_采购_info.json'
 // import sumList from '../../public/jsonData/skData/list_教育_info.json'
 
 
-// import res from "../../public/jsonData/allData/web_info_all.json"
-// import ECres from '../../public/jsonData/allData/web_data_all.json'
-// import sum from '../../public/jsonData/allData/list_all_add.json'
-// import sumList from '../../public/jsonData/allData/list_all_info.json'
+import res from "../../public/jsonData/allData/web_info_all.json"
+import ECres from '../../public/jsonData/allData/web_data_all.json'
+import sum from '../../public/jsonData/allData/list_all_add.json'
+import sumList from '../../public/jsonData/list_one_add.json'
 
 
 import settings from './moudles/settings'
@@ -39,13 +39,13 @@ export default new Vuex.Store({
   state: {
     res,
     json,
-    date: 604800,
+    date: (604800 / 7) * 30,
     ECres,
     sumList,
-    show: false,
+    show: true,
     setOption: [],
-    search: '全部',
-    nowDate: 1669345588000,
+    search: ['全部'],
+    nowDate: 1669629600000,
     sum
   },
 

@@ -25,12 +25,12 @@
               >监测列表</el-menu-item
             >
           </el-submenu>
-          <!-- <el-menu-item  index="4" @click="$router.push({ path: 'gu' })"
+          <el-menu-item  index="4" @click="$router.push({ path: 'gu' })"
             >股权穿透</el-menu-item
           >
           <el-menu-item index="5" @click="$router.push({ path: '/big' })"
             >数字化大屏</el-menu-item
-          > -->
+          >
         </el-menu>
       </el-aside>
       <el-container>

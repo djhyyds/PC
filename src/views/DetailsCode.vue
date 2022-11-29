@@ -57,6 +57,9 @@
             v-model="search2"
             filterable
             clearable
+            multiple
+            style="width: 260px"
+            collapse-tags
             @change="onSearch"
             placeholder="请选择分组"
           >
@@ -221,7 +224,7 @@ function findAllParent (node) {
     return [node.value]
   }
 }
-const filter = (a, b, c, d, e, f, g, data) => {
+const filter = (a, b, c, d, e, f, data) => {
   return data.filter(item => {
     let bool = true
     let bool2 = true
@@ -245,13 +248,11 @@ const filter = (a, b, c, d, e, f, g, data) => {
     if (e) {
       bool5 = item.时间戳 * 1000 >= e[0] && item.时间戳 * 1000 <= e[1]
     }
-    if (g && g == '投后') {
-      bool7 = item.分组.substr(0, 1) === '投'
-    }
-    if (f && f != '全部') {
-      if (f.length > 5) { bool6 = item.分组 === f } else {
-        bool6 = item.分组.substr(0, 1) === f.substr(0, 1)
-      }
+    console.log(e, 'eeeeeeeeee')
+    if (f.length != 0 && f.indexOf('全部') == -1) {
+
+      bool6 = f.find(a => a == item.分组)
+
     }
     return bool && bool2 && bool3 && bool4 && bool5 && bool6 && bool7
   })
@@ -267,7 +268,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(this.$store.state.nowDate - 3600 * 1000 * 24 * 7)
+            start.setTime(1669629600000 - 3600 * 1000 * 24 * 7)
 
             picker.$emit('pick', [start, end])
           }
@@ -276,7 +277,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(this.$store.state.nowDate - 3600 * 1000 * 24 * 30)
+            start.setTime(1669629600000 - 3600 * 1000 * 24 * 30)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -482,7 +483,6 @@ export default {
         this.search,
         this.value2,
         this.search2,
-        this.$store.state.th,
         this.res
       )
       this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
@@ -498,6 +498,11 @@ export default {
     },
 
     onSearch () {
+      if (this.search2[this.search2.length - 1] == '全部' || this.search2.length == 0) {
+        this.search2 = ['全部']
+      } else {
+        this.search2 = this.search2.filter(item => item != '全部')
+      }
       this.$store.commit("SearchChange", this.search2)
       this.into()
     }
@@ -510,7 +515,7 @@ export default {
       this.search = this.$route.params.GSname
     }
     if (this.$route.params.type) {
-      this.search2 = this.$route.params.type
+      this.search2 = [this.$route.params.type]
     }
     if (this.$route.params.name) {
       this.value = [0, this.$route.params.name]

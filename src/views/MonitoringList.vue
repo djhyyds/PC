@@ -55,31 +55,116 @@
         style="width: 100%; margin-top: 20px"
         height="700px"
       >
-        <el-table-column label="企业名称" min-width="150" header-align="center">
+        <el-table-column label="企业名称" min-width="170" header-align="center">
           <template slot-scope="scope">
             <div class="name">
-              <el-link type="primary" :underline="false">{{
-                scope.row["企业名称"]
-              }}</el-link>
+              <div class="link">
+                <el-link type="primary" :underline="false">{{
+                  scope.row["K02_企业"]
+                }}</el-link>
+                <el-tag
+                  size="mini"
+                  type="danger"
+                  @click="
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '高风险')
+                  "
+                  >高风险:{{ scope.row["K11_高风险"] }}</el-tag
+                >
+                <el-tag
+                  size="mini"
+                  type="warning"
+                  @click="
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '警示')
+                  "
+                  >警示:{{ scope.row["K12_警示"] }}</el-tag
+                >
+                <el-tag
+                  size="mini"
+                  type="success"
+                  @click="
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '利好')
+                  "
+                  >利好:{{ scope.row["K13_利好"] }}</el-tag
+                >
+                <el-tag
+                  size="mini"
+                  @click="
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
+                  "
+                  >提示:{{ scope.row["K14_提示"] }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  size="mini"
+                  @click="
+                    jump(
+                      scope.row['K02_企业'],
+                      scope.row['K01_分组'],
+                      '',
+                      '司法风险'
+                    )
+                  "
+                  >司法风险:{{ scope.row["K15_司法风险"] }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  size="mini"
+                  @click="
+                    jump(
+                      scope.row['K02_企业'],
+                      scope.row['K01_分组'],
+                      '',
+                      '工商风险'
+                    )
+                  "
+                  >工商风险:{{ scope.row["K16_工商风险"] }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  size="mini"
+                  @click="
+                    jump(
+                      scope.row['K02_企业'],
+                      scope.row['K01_分组'],
+                      '',
+                      '经营风险'
+                    )
+                  "
+                  >经营风险:{{ scope.row["K17_经营风险"] }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  size="mini"
+                  @click="
+                    jump(
+                      scope.row['K02_企业'],
+                      scope.row['K01_分组'],
+                      '',
+                      '经营状况'
+                    )
+                  "
+                  >经营状况:{{ scope.row["K18_经营状况"] }}</el-tag
+                >
+              </div>
               <el-link
                 type="warning"
                 :underline="false"
-                @click="jump(scope.row['企业名称'], scope.row['监测分组'])"
+                @click="jump(scope.row['K02_企业'], scope.row['K01_分组'])"
                 >查看历史监测动态></el-link
               >
             </div>
           </template>
         </el-table-column>
         <el-table-column
-          prop="监测时间"
+          prop="K03_监测开始日期"
           label="监测时间"
-          min-width="50"
+          min-width="30"
           align="center"
         ></el-table-column>
-        <el-table-column label="监测分组" min-width="70" align="center"
+        <el-table-column label="监测分组" min-width="40" align="center"
           ><template slot-scope="scope">
-            <span class="type" @click="jump('', scope.row['监测分组'])">{{
-              scope.row["监测分组"]
+            <span class="type" @click="jump('', scope.row['K01_分组'])">{{
+              scope.row["K01_分组"]
             }}</span>
           </template></el-table-column
         >
@@ -116,11 +201,13 @@ export default {
     }
   },
   methods: {
-    jump (a, b) {
+    jump (a, b, c, d) {
       this.$router.push({
         name: 'details', params: {
           GSname: a,
-          type: b
+          type: b,
+          a: c,
+          b: d
         }
       })
 
@@ -143,18 +230,18 @@ export default {
       this.tableData = this.tableData.filter(item => {
         let a = true, b = true
         if (this.setOption2.length != 0 && this.setOption2.indexOf('ALL') == -1) {
-          b = this.setOption2.find(a => a == item.监测分组)
+          b = this.setOption2.find(a => a == item.K01_分组)
         }
         if (this.search && this.search != '全部') {
-          a = item.企业名称 == this.search
+          a = item.K02_企业 == this.search
         }
 
         return a && b
       })
       console.log(this.tableData, this.setOption2)
       this.tableData.forEach(item => {
-        if (this.setOption.indexOf(item.企业名称) == -1) {
-          this.setOption.push(item.企业名称)
+        if (this.setOption.indexOf(item.K02_企业) == -1) {
+          this.setOption.push(item.K02_企业)
         }
       })
       this.currentPage = 1
@@ -182,15 +269,15 @@ export default {
   created () {
     this.sum = this.sum.sort((a, b) => b[1] - a[1])
     // this.res = res.filter(item => {
-    //   return this.$store.state.ECres.some(a => a.group === item.监测分组)
+    //   return this.$store.state.ECres.some(a => a.group === item.K01_分组)
     // })
 
 
     this.tableData = this.res
     this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
     this.tableData.forEach(item => {
-      if (this.setOption.indexOf(item.企业名称) == -1) {
-        this.setOption.push(item.企业名称)
+      if (this.setOption.indexOf(item.K02_企业) == -1) {
+        this.setOption.push(item.K02_企业)
       }
     })
   }
@@ -240,10 +327,15 @@ export default {
   }
 }
 .name {
+  color: rgb(166, 105, 223);
   padding: 0 10px;
   display: flex;
   align-content: center;
   justify-content: space-between;
+  .el-tag {
+    cursor: pointer;
+    margin-right: 2px;
+  }
 }
 .content {
   .title {

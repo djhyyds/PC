@@ -6,6 +6,8 @@
       <el-select
         v-if="this.$store.state.show"
         v-model="search2"
+        multiple
+        collapse-tags
         filterable
         clearable
         @change="onSearch"
@@ -87,12 +89,17 @@ export default {
       setOption2: this.$store.state.setOption,
       search2: this.$store.state.search,
       res2: this.$store.state.res,
-      res: "",
+      res: [],
       result: { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 }
     }
   },
   methods: {
     onSearch () {
+      if (this.search2[this.search2.length - 1] == '全部' || this.search2.length == 0) {
+        this.search2 = ['全部']
+      } else {
+        this.search2 = this.search2.filter(item => item != '全部')
+      }
       this.$store.commit("SearchChange", this.search2)
       this.into()
     },
@@ -100,15 +107,13 @@ export default {
       this.result = { 司法风险: 0, 工商风险: 0, 经营风险: 0, 经营状况: 0 }
       this.res = this.res2.filter(
         item => {
-          if (this.search2 && this.search2 != '全部') {
-            if (this.search2.length < 3) {
-              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组.substr(0, 1) == this.search2.substr(0, 1)
-            } else {
-              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组 == this.search2
-            }
+          if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
+            return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && this.search2.find(a => a == item.分组)
+
           } else {
             return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date
           }
+
         }
       )
       this.res.forEach(item => {
@@ -118,7 +123,9 @@ export default {
           this.result[item["风险维度"]] = 1
         }
       })
-
+      if (this.res.length == 0) {
+        this.res.length = 1
+      }
       this.show()
       this.show1()
       this.show2()
@@ -358,27 +365,61 @@ export default {
       option && this.myChart3.setOption(option)
     },
     show4 () {
-      var option
+      let option
 
       let a, b = true
       a = this.date == 604800 ? 7 : 30
-      let s = this.ECres.find(
-        item => {
-          if (this.search2 && this.search2 != '全部') {
-            b = item.group === this.search2
-          } else {
-            if (item.group == 'all') { b = item.group == 'all' }
-            else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
-              b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
-            } else {
-              b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
-            }
-          }
-          return item["info_" + a] && b
-        }
-      )
+      let s = [], r = []
+      if (this.search2.length) {
+        this.search2.forEach(item2 => {
+          r = this.ECres.find(
+            item => {
+              if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
+                b = item.group === item2
+              } else {
+                if (item.group == 'all') { b = item.group == 'all' }
+                else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
+                  b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
+                } else {
+                  b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
+                }
+              }
 
-      var data = s["info_" + a]
+              return item["info_" + a] && b
+
+            }
+          )
+          console.log(r, '444444444444')
+          s.push(r)
+        })
+      }
+      console.log(s, 'ssssssssssss')
+      let aaa = null
+      if (s.length == 1) {
+        aaa = s[0]
+      } else {
+        let ts = []
+        ts = s.reduce((prev, cur) => {
+          return cur["info_" + a].concat(prev)
+        }, [])
+
+        let temp = {}   //用于name判断重复
+        let result = []  //最后的新数组
+
+        ts.map(function (item) {
+          if (!temp[item.name]) {
+            result.push(JSON.parse(JSON.stringify(item)))
+            temp[item.name] = true
+          } else {
+            result.filter(a => a.name == item.name)[0].value += item.value
+          }
+          aaa = {}
+          aaa["info_" + a] = result
+        })
+
+        console.log(ts, s, result)
+      }
+      let data = aaa["info_" + a]
       data = data.sort((a, b) => {
         let value1 = a["value"],
           value2 = b["value"]
@@ -408,6 +449,7 @@ export default {
           data: data
         }
       }
+      console.log(option)
       option && this.myChart4.setOption(option)
       this.myChart4.on('click', (e) => {
         this.$router.push({ name: 'details', params: { name: e.name } })
@@ -439,6 +481,9 @@ export default {
   display: flex;
   justify-content: space-between;
   margin: 20px;
+  .el-select {
+    width: 240px;
+  }
   .active {
     color: aqua;
   }

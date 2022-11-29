@@ -6,6 +6,8 @@
       <el-select
         v-if="this.$store.state.show"
         v-model="search2"
+        multiple
+        collapse-tags
         filterable
         clearable
         @change="onSearch"
@@ -85,8 +87,7 @@ export default {
       search2: '',
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
       res2: this.$store.state.res,
-      res: "",
-      gaugeData: [],
+      res: [],
       myChart: "",
       myChart1: "",
       myChart2: "",
@@ -97,6 +98,12 @@ export default {
   },
   methods: {
     onSearch () {
+      if (this.search2[this.search2.length - 1] == '全部' || this.search2.length == 0) {
+        this.search2 = ['全部']
+      } else {
+        this.search2 = this.search2.filter(item => item != '全部')
+      }
+      console.log(this.search2)
       this.$store.commit("SearchChange", this.search2)
       this.into()
     },
@@ -105,12 +112,9 @@ export default {
 
       this.res = this.res2.filter(
         item => {
-          if (this.search2 && this.search2 != '全部') {
-            if (this.search2.length < 3) {
-              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组.substr(0, 1) == this.search2.substr(0, 1)
-            } else {
-              return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && item.分组 == this.search2
-            }
+          if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
+            return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && this.search2.find(a => a == item.分组)
+
           } else {
             return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date
           }
@@ -124,7 +128,10 @@ export default {
           this.result[item["等级"]] = 1
         }
       })
-      this.show()
+      if (this.res.length == 0) {
+        this.res.length = 1
+      }
+      this.show5()
       this.show1()
       this.show2()
       this.show3()
@@ -144,9 +151,9 @@ export default {
         }
       })
     },
-    show () {
+    show5 () {
       let option
-      this.gaugeData = [
+      let gaugeData = [
         {
           value: ((this.result["高风险"] / this.res.length) * 100).toFixed(2),
           detail: {
@@ -190,10 +197,11 @@ export default {
               show: false,
               distance: 50
             },
-            data: this.gaugeData,
+            data: gaugeData,
             detail: {
               fontSize: 20,
               color: "red",
+              borderColor: "auto",
               formatter: "{value}%"
             }
           }
@@ -203,7 +211,8 @@ export default {
     },
     show1 () {
       let option
-      const gaugeData = [
+
+      let gaugeData = [
         {
           value: ((this.result["警示"] / this.res.length) * 100).toFixed(2),
           detail: {
@@ -261,7 +270,7 @@ export default {
     },
     show2 () {
       let option
-      this.gaugeData = [
+      let gaugeData = [
         {
           value: ((this.result["提示"] / this.res.length) * 100).toFixed(2),
           detail: {
@@ -305,7 +314,7 @@ export default {
               show: false,
               distance: 50
             },
-            data: this.gaugeData,
+            data: gaugeData,
             detail: {
               fontSize: 20,
               color: "#aa77cc",
@@ -319,7 +328,7 @@ export default {
     },
     show3 () {
       let option
-      const gaugeData = [
+      let gaugeData = [
         {
           value: ((this.result["利好"] / this.res.length) * 100).toFixed(2),
           detail: {
@@ -381,23 +390,58 @@ export default {
       var option
       let a, b = true
       a = this.date == 604800 ? 7 : 30
-      let s = this.ECres.find(
-        item => {
-
-          if (this.search2 && this.search2 != '全部') {
-            b = item.group === this.search2
-          } else {
-            if (item.group == 'all') { b = item.group == 'all' }
-            else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
-              b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
-            } else {
-              b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
+      let s = []
+      if (this.search2.length) {
+        this.search2.forEach(item2 => {
+          let r = this.ECres.find(
+            item => {
+              if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
+                b = item.group === item2
+              } else {
+                if (item.group == 'all') { b = item.group == 'all' }
+                else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
+                  b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
+                } else {
+                  b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
+                }
+              }
+              return item['source_' + a] && b
             }
-          }
+          )
+          s.push(r)
+       
+        })
+      }
 
-          return item['source_' + a] && b
-        }
-      )
+      let aaa = null
+      if (s.length == 1) {
+        aaa = s[0]
+      } else {
+        let ts = [[], [], [], [], []]
+        s.forEach(item => {
+          ts[0] = item['source_' + a][0]
+          ts[1].push(item['source_' + a][1])
+          ts[2].push(item['source_' + a][2])
+          ts[3].push(item['source_' + a][3])
+          ts[4].push(item['source_' + a][4])
+        })
+        ts.forEach((item, index) => {
+          if (index > 0) {
+            ts[index] = item.reduce((prev, cur) => {
+              cur.forEach((item, index) => {
+                if (typeof prev[index] === 'number') {
+                  prev[index] += item
+                } else {
+                  prev[index] = item
+                }
+              })
+              return prev
+            }, [])
+          }
+        })
+        aaa = {}
+        aaa['source_' + a] = ts
+      }
 
       option = {
         legend: {},
@@ -405,7 +449,7 @@ export default {
           trigger: "axis"
         },
         dataset: {
-          source: s['source_' + a]
+          source: aaa['source_' + a]
         },
         xAxis: { type: "category", boundaryGap: false },
         yAxis: { gridIndex: 0 },
@@ -513,6 +557,7 @@ export default {
       //     })
       //   }
       // })
+
       this.myChart4.setOption(option)
     }
   },
@@ -550,6 +595,9 @@ export default {
 <style lang='less' scoped>
 .about {
   .input {
+    .el-select {
+      width: 240px;
+    }
     display: flex;
     justify-content: space-between;
     margin: 20px;
