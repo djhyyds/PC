@@ -417,7 +417,7 @@ export default {
     },
     handleClick (ev, data, d3) {
       this.clickElement = data
-      console.log(ev)
+
       this.clickTools.style.transform = `translate(${ev.layerX +
         40}px, ${ev.layerY + 40}px)`
 
@@ -466,7 +466,7 @@ export default {
       this.clickTools.style.display = 'none'
     },
     clear (ev) {
-      console.log(ev.target)
+
 
       if (ev.target instanceof SVGSVGElement) {
         // this.bool = true
@@ -517,7 +517,7 @@ export default {
 
     mouseover (event, data) {
       if (data === null) {
-        console.log(data, 'nulllllllllllllll')
+
       }
       this.obj = data
       event.target.parentElement.style.color = '#' + data.color
@@ -7200,7 +7200,7 @@ export default {
       })
 
       // console.log(nodes, 'nodes_-')
-      console.log(nodes, 'node_s')
+
       depchs(this.isStart ? [nodes[0]] : [nodes.at(-1)])
 
 
@@ -7239,7 +7239,7 @@ export default {
       })
 
       this.list = list
-      console.log(list, 'list__')
+  
 
       this.svgWidth = list.length * 420
       const max = list.reduce((prev, cur) => {
@@ -7250,8 +7250,6 @@ export default {
       }, 0)
 
       this.svgHeight = max * 80
-      console.log(this.svgHeight, 'this.svgHeight')
-
 
       setTimeout(() => {
         if (this.isStart) {

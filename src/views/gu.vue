@@ -25,6 +25,7 @@ export default {
       var myChart = echarts.init(chartDom, "dark")
       var option
       let open = true
+      let sum = 10
       var data = {
         nodes: this.down,
         links: this.downList
@@ -225,7 +226,40 @@ export default {
         ],
         tooltip: {
           trigger: "item",
-          formatter: '{b}<br/>投资占比：{c}%'
+          padding: 15,
+          renderMode: 'html',
+          formatter (params) {
+            console.log(params)
+            //自定义模板
+            let res
+            if (params.dataType == 'node') {
+              res = `<div>资产构成</div>
+                        <span style="display:inline-block;margin-right:4px;
+						border-radius:10px;width:10px;height:10px;
+						background-color:#91cc75;"></span>
+                        <span style="margin-right:10%;">${params.name} 投资金额:1770万 占比:70%</span>  
+                        <br/>     
+                         <span style="display:inline-block;margin-right:4px;
+						border-radius:10px;width:10px;height:10px;
+						background-color:red;"></span>
+                        <span style="margin-right:10%;">广东横琴海联科技投资有限公司 投资金额:177万 占比:20%</span>  
+                        <br/>   
+                         <span style="display:inline-block;margin-right:4px;
+						border-radius:10px;width:10px;height:10px;
+						background-color:red;"></span>
+                        <span style="margin-right:10%;">柳州市海联金汇汽车零部件有限公司 投资金额:77万 占比:10%</span>  
+                        <br/>    
+                        `
+            }
+            else {
+              let value = +params.value
+              value = value.toFixed(2)
+              res = `${params.name}        投资占比:${value}% `
+            }
+
+            return res
+            //返回自定义内容
+          }
         }
       }
       option && myChart.setOption(option)
@@ -325,7 +359,7 @@ export default {
 
     this.down = formatArr()
 
-    console.log(this.down)
+
   }
 };
 </script>

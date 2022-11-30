@@ -34,7 +34,9 @@ import sumList from '../../public/jsonData/list_one_add.json'
 import settings from './moudles/settings'
 import json from '../../public/jsonData/index.json'
 Vue.use(Vuex)
-
+// const VuexLocal = new VuexPersistence({
+//   storage: window.localStorage
+// })
 export default new Vuex.Store({
   state: {
     res,

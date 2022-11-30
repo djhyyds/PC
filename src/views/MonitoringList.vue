@@ -32,6 +32,8 @@
         style="width: 300px; margin-top: 10px"
         v-model="search"
         filterable
+        multiple
+        collapse-tags
         clearable
         @change="onSearch"
         placeholder="请输入公司名称"
@@ -60,93 +62,93 @@
             <div class="name">
               <div class="link">
                 <el-link type="primary" :underline="false">{{
-                  scope.row["K02_企业"]
+                  scope.row["企业名称"]
                 }}</el-link>
                 <el-tag
-                  :effect="scope.row['K11_高风险'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K11_高风险'] == 0 ? null : 'dark'"
                   size="mini"
                   type="danger"
                   @click="
-                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '高风险')
+                    jump(scope.row['企业名称'], scope.row['K01_分组'], '高风险')
                   "
                   >高风险:{{ scope.row["K11_高风险"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K12_警示'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K12_警示'] == 0 ? null : 'dark'"
                   size="mini"
                   type="warning"
                   @click="
-                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '警示')
+                    jump(scope.row['企业名称'], scope.row['K01_分组'], '警示')
                   "
                   >警示:{{ scope.row["K12_警示"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K13_利好'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K13_利好'] == 0 ? null : 'dark'"
                   size="mini"
                   type="success"
                   @click="
-                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '利好')
+                    jump(scope.row['企业名称'], scope.row['K01_分组'], '利好')
                   "
                   >利好:{{ scope.row["K13_利好"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K14_提示'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K14_提示'] == 0 ? null : 'dark'"
                   size="mini"
                   @click="
-                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
+                    jump(scope.row['企业名称'], scope.row['K01_分组'], '提示')
                   "
                   >提示:{{ scope.row["K14_提示"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K15_司法风险'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K15_司法风险'] == 0 ? null : 'dark'"
                   size="mini"
                   type="warning"
                   @click="
                     jump(
-                      scope.row['K02_企业'],
+                      scope.row['企业名称'],
                       scope.row['K01_分组'],
-                      '',
+                      null,
                       '司法风险'
                     )
                   "
                   >司法风险:{{ scope.row["K15_司法风险"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K16_工商风险'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K16_工商风险'] == 0 ? null : 'dark'"
                   size="mini"
                   type="warning"
                   @click="
                     jump(
-                      scope.row['K02_企业'],
+                      scope.row['企业名称'],
                       scope.row['K01_分组'],
-                      '',
+                      null,
                       '工商风险'
                     )
                   "
                   >工商风险:{{ scope.row["K16_工商风险"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K17_经营风险'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K17_经营风险'] == 0 ? null : 'dark'"
                   size="mini"
                   type="warning"
                   @click="
                     jump(
-                      scope.row['K02_企业'],
+                      scope.row['企业名称'],
                       scope.row['K01_分组'],
-                      '',
+                      null,
                       '经营风险'
                     )
                   "
                   >经营风险:{{ scope.row["K17_经营风险"] }}</el-tag
                 >
                 <el-tag
-                  :effect="scope.row['K18_经营状况'] == 0 ? '' : 'dark'"
+                  :effect="scope.row['K18_经营状况'] == 0 ? null : 'dark'"
                   size="mini"
                   @click="
                     jump(
-                      scope.row['K02_企业'],
+                      scope.row['企业名称'],
                       scope.row['K01_分组'],
-                      '',
+                      null,
                       '经营状况'
                     )
                   "
@@ -156,7 +158,7 @@
               <el-link
                 type="warning"
                 :underline="false"
-                @click="jump(scope.row['K02_企业'], scope.row['K01_分组'])"
+                @click="jump(scope.row['企业名称'], scope.row['K01_分组'])"
                 >查看历史监测动态></el-link
               >
             </div>
@@ -170,7 +172,7 @@
         ></el-table-column>
         <el-table-column label="监测分组" min-width="40" align="center"
           ><template slot-scope="scope">
-            <span class="type" @click="jump('', scope.row['K01_分组'])">{{
+            <span class="type" @click="jump(null, scope.row['K01_分组'])">{{
               scope.row["K01_分组"]
             }}</span>
           </template></el-table-column
@@ -232,25 +234,26 @@ export default {
       this.onSearch()
     },
     onSearch () {
-      this.setOption = ['全部']
+      if (this.search[this.search.length - 1] == '全部' || this.search.length == 0) {
+        this.search = ['全部']
+      } else {
+        this.search = this.search.filter(item => item != '全部')
+      }
       this.tableData = this.res
       this.tableData = this.tableData.filter(item => {
         let a = true, b = true
         if (this.setOption2.length != 0 && this.setOption2.indexOf('ALL') == -1) {
           b = this.setOption2.find(a => a == item.K01_分组)
         }
-        if (this.search && this.search != '全部') {
-          a = item.K02_企业 == this.search
+        if (this.search.indexOf('全部') == -1) {
+          a = this.search.find(a => a == item.企业名称
+          )
         }
 
         return a && b
       })
-      console.log(this.tableData, this.setOption2)
-      this.tableData.forEach(item => {
-        if (this.setOption.indexOf(item.K02_企业) == -1) {
-          this.setOption.push(item.K02_企业)
-        }
-      })
+
+
       this.currentPage = 1
       this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
     },
@@ -282,9 +285,9 @@ export default {
 
     this.tableData = this.res
     this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
-    this.tableData.forEach(item => {
-      if (this.setOption.indexOf(item.K02_企业) == -1) {
-        this.setOption.push(item.K02_企业)
+    this.res.forEach(item => {
+      if (this.setOption.indexOf(item.企业名称) == -1) {
+        this.setOption.push(item.企业名称)
       }
     })
   }

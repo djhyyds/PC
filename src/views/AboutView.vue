@@ -104,7 +104,7 @@ export default {
       } else {
         this.search2 = this.search2.filter(item => item != '全部')
       }
-      console.log(this.search2)
+
       this.$store.commit("SearchChange", this.search2)
       this.into()
     },

@@ -5,30 +5,30 @@
         width="10%"
         style="background-color: rgb(238, 241, 246); overflow: hidden"
       >
-        <el-menu default-active="1">
+        <el-menu :default-active="$route.name">
           <el-submenu index="0">
             <template slot="title">
               <span>风险监测</span>
             </template>
-            <el-menu-item index="1" @click="$router.push({ name: 'about' })"
+            <el-menu-item index="about" @click="$router.push({ name: 'about' })"
               >风险级别</el-menu-item
             >
-            <el-menu-item index="2" @click="$router.push({ name: 'risk' })"
+            <el-menu-item index="risk" @click="$router.push({ name: 'risk' })"
               >风险维度</el-menu-item
             >
             <el-menu-item
-              index="3"
+              index="details"
               @click="$router.push({ name: 'details', params: { a: '' } })"
               >监测动态</el-menu-item
             >
-            <el-menu-item index="6" @click="$router.push({ name: 'list' })"
+            <el-menu-item index="list" @click="$router.push({ name: 'list' })"
               >监测列表</el-menu-item
             >
           </el-submenu>
-          <el-menu-item  index="4" @click="$router.push({ path: 'gu' })"
+          <el-menu-item index="gu" @click="$router.push({ path: 'gu' })"
             >股权穿透</el-menu-item
           >
-          <el-menu-item index="5" @click="$router.push({ path: '/big' })"
+          <el-menu-item index="big" @click="$router.push({ path: '/big' })"
             >数字化大屏</el-menu-item
           >
         </el-menu>
@@ -45,10 +45,11 @@
 <script>
 export default {
   methods: {
-    stop() {
-      this.$router.replace({ name: "login" });
+    stop () {
+      this.$router.replace({ name: "login" })
     }
-  }
+  },
+
 };
 </script>
 <style lang='less'>

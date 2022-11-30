@@ -392,11 +392,10 @@ export default {
 
             }
           )
-          console.log(r, '444444444444')
           s.push(r)
         })
       }
-      console.log(s, 'ssssssssssss')
+
       let aaa = null
       if (s.length == 1) {
         aaa = s[0]
@@ -420,7 +419,6 @@ export default {
           aaa["info_" + a] = result
         })
 
-        console.log(ts, s, result)
       }
       let data = aaa["info_" + a]
       data = data.sort((a, b) => {
@@ -452,7 +450,7 @@ export default {
           data: data
         }
       }
-      console.log(option)
+  
       option && this.myChart4.setOption(option)
       this.myChart4.on('click', (e) => {
         this.$router.push({ name: 'details', params: { name: e.name } })

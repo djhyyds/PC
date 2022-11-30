@@ -4,14 +4,14 @@
     <hr />
     <div class="input">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item>
+        <el-form-item label="风险级别 :">
           <el-select
             multiple
             collapse-tags
-            style="width: 200px"
+            style="width: 180px"
             @change="onSubmit"
             v-model="formInline.region"
-            placeholder="风险级别"
+            placeholder="请选择风险级别"
           >
             <el-option label="全部" value="全部"></el-option>
             <el-option label="高风险" value="高风险"></el-option>
@@ -20,8 +20,22 @@
             <el-option label="利好" value="利好"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="风险维度 :">
           <el-cascader
+            style="width: 400px"
+            v-model="value"
+            @change="ItemClick"
+            collapse-tags
+            :options="options"
+            filterable
+            :props="{
+              multiple: true,
+              checkStrictly: false,
+              expandTrigger: 'hover',
+            }"
+            clearable
+          ></el-cascader>
+          <!-- <el-cascader
             v-model="value"
             collapse-tags
             :options="options"
@@ -38,35 +52,38 @@
             <template slot-scope="{ node, data }">
               <div @click="() => onItemClick(node, data)">
                 <span>{{ data.label }}</span>
-                <!-- <span v-if="!node.isLeaf">({{ data.children.length }})</span> -->
+              
               </div>
             </template>
-          </el-cascader>
+          </el-cascader> -->
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="企业名称 :">
           <el-select
             v-model="search"
             filterable
+            style="width: 400px"
+            multiple
+            collapse-tags
             clearable
             @change="onSearch"
             placeholder="请输入公司名称"
           >
             <el-option
-              v-for="item in setOption"
+              v-for="item in setOption3"
               :key="item"
               :label="item"
               :value="item"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="this.$store.state.show">
+        <el-form-item label="监测分组 :" v-if="this.$store.state.show">
           <el-select
             v-model="search2"
             filterable
             multiple
-            clearable
             collapse-tags
-            style="width: 260px"
+            clearable
+            style="width: 350px"
             @change="onSearch"
             placeholder="请选择分组"
           >
@@ -78,7 +95,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="监测日期 :">
           <el-date-picker
             v-model="value2"
             type="daterange"
@@ -128,10 +145,10 @@
         <el-table-column
           prop="日期"
           label="更新时间"
-          width="150"
+          width="120"
           align="center"
         ></el-table-column>
-        <el-table-column label="监测主体" min-width="200" header-align="center">
+        <el-table-column label="监测主体" min-width="160" header-align="center">
           <template slot-scope="scope">
             <el-link type="primary" :underline="false">{{
               scope.row["公司"]
@@ -140,7 +157,18 @@
             <!-- <el-link type="warning" :underline="false">历史监测动态</el-link> -->
           </template>
         </el-table-column>
-        <el-table-column label="风险级别" min-width="80" align="center">
+        <el-table-column label="风险维度" min-width="60" align="center">
+          <template slot-scope="scope">
+            <el-link
+              :type="
+                scope.row['风险维度'] == '经营状况' ? 'primary' : 'warning'
+              "
+              :underline="false"
+              >{{ scope.row["风险维度"] }}</el-link
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="风险级别" min-width="60" align="center">
           <template slot-scope="scope">
             <el-link
               v-if="scope.row['等级'] == '警示'"
@@ -168,19 +196,20 @@
         <el-table-column
           prop="类型"
           label="动态类型"
-          width="120"
+          width="100"
+          align="center"
         ></el-table-column>
-        <el-table-column label="动态内容" min-width="200" header-align="center">
+        <el-table-column label="动态内容" min-width="150" header-align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.详情 }}</span>
             <!-- <el-link @click="open(scope.row.备注)" type="primary">详情</el-link> -->
           </template>
         </el-table-column>
-        <el-table-column label="动态详情" min-width="200" header-align="center">
+        <el-table-column label="动态详情" min-width="250" header-align="center">
           <template slot-scope="scope">
             <span ref="bei">{{ bei(scope.row.备注) }}</span>
             <el-link
-              v-if="scope.row.备注.length > 70"
+              v-if="scope.row.备注.length > codeLength"
               @click="open(scope.row.备注)"
               type="primary"
               >详情</el-link
@@ -228,16 +257,16 @@
   </div>
 </template>
 <script>
-function findAllParent (node) {
-  if (node.parent) {
-    const arr = findAllParent(node.parent)
-    arr.push(node.data.value)
-    return arr
-  } else {
-    return [node.value]
-  }
-}
-const filter = (a, b, c, d, e, f, data) => {
+// function findAllParent (node) {
+//   if (node.parent) {
+//     const arr = findAllParent(node.parent)
+//     arr.push(node.data.value)
+//     return arr
+//   } else {
+//     return [node.value]
+//   }
+// }
+const filter = (a, b, c, d, e, f, g, data) => {
   return data.filter(item => {
     let bool = true
     let bool2 = true
@@ -255,16 +284,17 @@ const filter = (a, b, c, d, e, f, data) => {
     if (c) {
       bool3 = item.风险维度 === c
     }
-    if (d && d != '全部') {
-      bool4 = item.公司 === d
+    if (d.length != 0 && d.indexOf('全部') == -1) {
+      bool4 = d.find(q => q == item.公司)
     }
     if (e) {
       bool5 = item.时间戳 * 1000 >= e[0] && item.时间戳 * 1000 <= e[1]
     }
     if (f.length != 0 && f.indexOf('全部') == -1) {
-
       bool6 = f.find(a => a == item.分组)
-
+    }
+    if (g.length != 0) {
+      bool7 = g.find(a => a == item.类型)
     }
     return bool && bool2 && bool3 && bool4 && bool5 && bool6 && bool7
   })
@@ -272,7 +302,8 @@ const filter = (a, b, c, d, e, f, data) => {
 export default {
   data () {
     return {
-
+      b: '',
+      c: '',
       value2: '',
       pickerOptions: {
         shortcuts: [{
@@ -298,115 +329,124 @@ export default {
       date: this.$store.state.date,
       setOption: ['全部'],
       setOption2: this.$store.state.setOption,
+      setOption3: ['全部'],
       search2: this.$store.state.search,
-      search: "",
+      search: ['全部'],
       input: "",
       formInline: {
         region: ""
       },
-      value: "",
+      value: [],
       options: [
         {
-          value: "",
-          label: "全部"
+          value: "全部",
+          label: "全部",
+          children: [{
+            value: "司法风险",
+            label: "司法风险",
+            children: [
+              // { label: "全部", value: "司法风险" },
+              { label: "法律诉讼", value: "法律诉讼" },
+              { label: "法院公告", value: "法院公告" },
+              { label: "失信被执行人", value: "失信被执行人" },
+              { label: "被执行人", value: "被执行人" },
+              { label: "开庭公告", value: "开庭公告" },
+              { label: "司法协助", value: "司法协助" },
+              { label: "送达公告", value: "送达公告" },
+              { label: "立案信息", value: "立案信息" },
+              { label: "限制消费令", value: "限制消费令" },
+              { label: "终本案件", value: "终本案件" },
+              { label: "涉金融黑名单", value: "涉金融黑名单" },
+              { label: "破产重整", value: "破产重整" },
+              { label: "询价评估", value: "询价评估" }
+            ]
+          },
+          {
+            label: "工商风险",
+            value: "工商风险",
+            children: [
+              // { label: " 全部", value: "工商风险" },
+              { label: "股权变更", value: "股权变更" },
+              { label: "股权信息", value: "股权信息" },
+              { label: "股东变更", value: "股东变更" },
+              { label: "大股东变更", value: "大股东变更" },
+              { label: "主要人员变更", value: "主要人员变更" },
+              { label: "任职信息", value: "任职信息" },
+              { label: "企业状态变更", value: "企业状态变更" },
+              { label: "企业类型变更", value: "企业类型变更" },
+              { label: "法定代表人变更", value: "法定代表人变更" },
+              { label: "企业名称变更", value: "企业名称变更" },
+              { label: "注册资本变更", value: "注册资本变更" },
+              { label: "登记机关变更", value: "登记机关变更" },
+              { label: "注册地址变更", value: "注册地址变更" },
+              { label: "经营范围变更", value: "经营范围变更" },
+              { label: "机构成员", value: "机构成员" }
+            ]
+          },
+          {
+            label: "经营风险",
+            value: "经营风险",
+            children: [
+              // { label: "全部", value: "经营风险" },
+              { label: "经营异常", value: "经营异常" },
+              { label: "严重违法", value: "严重违法" },
+              { label: "股权出质", value: "股权出质" },
+              { label: "动产抵押", value: "动产抵押" },
+              { label: "欠税公告", value: "欠税公告" },
+              { label: "司法拍卖", value: "司法拍卖" },
+              { label: "清算信息", value: "清算信息" },
+              { label: "税收违法", value: "税收违法" },
+              { label: "简易注销", value: "简易注销" },
+              { label: "行政处罚", value: "行政处罚" },
+              { label: "环保处罚", value: "环保处罚" },
+              { label: "公示催告", value: "公示催告" },
+              { label: "土地抵押", value: "土地抵押" },
+              { label: "股权质押", value: "股权质押" },
+              { label: "股权冻结", value: "股权冻结" },
+              { label: "注销备案", value: "注销备案" },
+              { label: "管理基金", value: "管理基金" }
+            ]
+          },
+          {
+            label: "经营状况",
+            value: "经营状况",
+            children: [
+              // { label: "全部", value: "经营状况" },
+              { label: "投融资动态", value: "投融资动态" },
+              { label: "对外投资", value: "对外投资" },
+              { label: "融资动态", value: "融资动态" },
+              { label: "招投标", value: "招投标" },
+              { label: "债券信息", value: "债券信息" },
+              { label: "购地信息", value: "购地信息" },
+              { label: "税务评级", value: "税务评级" },
+              { label: "抽查检查", value: "抽查检查" },
+              { label: "产品信息", value: "产品信息" },
+              { label: "进出口信用", value: "进出口信用" },
+              { label: "知识产权", value: "知识产权" },
+
+              { label: "软件著作权", value: "软件著作权" },
+              { label: "商标信息", value: "商标信息" },
+              { label: "专利信息", value: "专利信息" },
+              { label: "土地转让", value: "土地转让" },
+              { label: "地块公示", value: "地块公示" },
+              { label: "行政许可", value: "行政许可" },
+              { label: "电信许可", value: "电信许可" },
+              { label: "一般纳税人", value: "一般纳税人" },
+              { label: "产品召回", value: "产品召回" },
+              { label: "上榜榜单", value: "上榜榜单" },
+              { label: "食品安全", value: "食品安全" },
+              { label: "客户供应商", value: "客户供应商" },
+              { label: "信用评级", value: "信用评级" },
+              { label: "公告研报", value: "公告研报" },
+              { label: "资产交易", value: "资产交易" }
+            ]
+          }, {
+            label: '投融资动态',
+            value: '投融资动态',
+            children: [{ label: "投资事件", value: "投资事件" }, { label: "对外投资", value: "对外投资" }, { label: "融资动态", value: "融资动态" },]
+          }]
         },
-        {
-          value: "司法风险",
-          label: "司法风险",
-          children: [
-            // { label: "全部", value: "司法风险" },
-            { label: "法律诉讼", value: "法律诉讼" },
-            { label: "法院公告", value: "法院公告" },
-            { label: "失信被执行人", value: "失信被执行人" },
-            { label: "被执行人", value: "被执行人" },
-            { label: "开庭公告", value: "开庭公告" },
-            { label: "司法协助", value: "司法协助" },
-            { label: "送达公告", value: "送达公告" },
-            { label: "立案信息", value: "立案信息" },
-            { label: "限制消费令", value: "限制消费令" },
-            { label: "终本案件", value: "终本案件" },
-            { label: "涉金融黑名单", value: "涉金融黑名单" },
-            { label: "破产重整", value: "破产重整" },
-            { label: "询价评估", value: "询价评估" }
-          ]
-        },
-        {
-          label: "工商风险",
-          value: "工商风险",
-          children: [
-            // { label: " 全部", value: "工商风险" },
-            { label: "股权变更", value: "股权变更" },
-            { label: "股权信息", value: "股权信息" },
-            { label: "股东变更", value: "股东变更" },
-            { label: "大股东变更", value: "大股东变更" },
-            { label: "主要人员变更", value: "主要人员变更" },
-            { label: "任职信息", value: "任职信息" },
-            { label: "企业状态变更", value: "企业状态变更" },
-            { label: "企业类型变更", value: "企业类型变更" },
-            { label: "法定代表人变更", value: "法定代表人变更" },
-            { label: "企业名称变更", value: "企业名称变更" },
-            { label: "注册资本变更", value: "注册资本变更" },
-            { label: "登记机关变更", value: "登记机关变更" },
-            { label: "注册地址变更", value: "注册地址变更" },
-            { label: "经营范围变更", value: "经营范围变更" },
-            { label: "机构成员", value: "机构成员" }
-          ]
-        },
-        {
-          label: "经营风险",
-          value: "经营风险",
-          children: [
-            // { label: "全部", value: "经营风险" },
-            { label: "经营异常", value: "经营异常" },
-            { label: "严重违法", value: "严重违法" },
-            { label: "股权出质", value: "股权出质" },
-            { label: "动产抵押", value: "动产抵押" },
-            { label: "欠税公告", value: "欠税公告" },
-            { label: "司法拍卖", value: "司法拍卖" },
-            { label: "清算信息", value: "清算信息" },
-            { label: "税收违法", value: "税收违法" },
-            { label: "简易注销", value: "简易注销" },
-            { label: "行政处罚", value: "行政处罚" },
-            { label: "环保处罚", value: "环保处罚" },
-            { label: "公示催告", value: "公示催告" },
-            { label: "土地抵押", value: "土地抵押" },
-            { label: "股权质押", value: "股权质押" },
-            { label: "股权冻结", value: "股权冻结" },
-            { label: "注销备案", value: "注销备案" },
-            { label: "管理基金", value: "管理基金" }
-          ]
-        },
-        {
-          label: "经营状况",
-          value: "经营状况",
-          children: [
-            // { label: "全部", value: "经营状况" },
-            { label: "投融资动态", value: "投融资动态" },
-            { label: "招投标", value: "招投标" },
-            { label: "债券信息", value: "债券信息" },
-            { label: "商标信息", value: "商标信息" },
-            { label: "专利信息", value: "专利信息" },
-            { label: "软件著作权", value: "软件著作权" },
-            { label: "购地信息", value: "购地信息" },
-            { label: "税务评级", value: "税务评级" },
-            { label: "抽查检查", value: "抽查检查" },
-            { label: "产品信息", value: "产品信息" },
-            { label: "进出口信用", value: "进出口信用" },
-            { label: "知识产权", value: "知识产权" },
-            { label: "土地转让", value: "土地转让" },
-            { label: "地块公示", value: "地块公示" },
-            { label: "行政许可", value: "行政许可" },
-            { label: "电信许可", value: "电信许可" },
-            { label: "一般纳税人", value: "一般纳税人" },
-            { label: "产品召回", value: "产品召回" },
-            { label: "上榜榜单", value: "上榜榜单" },
-            { label: "食品安全", value: "食品安全" },
-            { label: "客户供应商", value: "客户供应商" },
-            { label: "信用评级", value: "信用评级" },
-            { label: "公告研报", value: "公告研报" },
-            { label: "资产交易", value: "资产交易" }
-          ]
-        }
+
       ],
       tableData: [],
       tableCopeTableList: [],
@@ -415,14 +455,19 @@ export default {
       risk: "",
       res: "",
       result: "",
-      showBei: false
+      showBei: false,
+      codeLength: 200
     }
   },
   methods: {
+
+    ItemClick () {
+      this.into()
+    },
     bei (a) {
-      if (a.length > 70) {
+      if (a.length > this.codeLength) {
         this.showBei = true
-        return a.substr(0, 70) + '...'
+        return a.substr(0, this.codeLength) + '...'
       } return a
     },
     handleClose () {
@@ -438,15 +483,12 @@ export default {
       // this.date = this.$store.state.date
       this.into()
     },
-    onItemClick (node) {
-
-      this.$refs.myCascadeRef.dropDownVisible = true
-      // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
-      this.value = findAllParent(node)
-
-
-      this.into()
-    },
+    // onItemClick (node) {
+    //   this.$refs.myCascadeRef.dropDownVisible = false
+    //   // 级联组件选中之后，默认的选中值为数组，这里我们也和组件保持一致，不然，选中值就可能出现两种情况，一种是自己的设置的非数组值，一种是组件自行设置的数组值
+    //   this.value = findAllParent(node)
+    //   this.into()
+    // },
     handleSizeChange (pageSize) {
       this.pageSize = pageSize
       this.tableData = this.currentChangePage(pageSize, this.currentPage)
@@ -475,31 +517,25 @@ export default {
       this.into()
     },
     into () {
-
       this.currentPage = 1
       this.setOption = ['全部']
       // this.setOption2 = ['全部']
       this.risk = this.formInline.region
-      let b, c
 
-
-      if (Array.isArray(this.value)) {
-        if (this.value.length == 1) {
-          c = this.value[0]
-        } else {
-          b = this.value[1]
-        }
-      } else {
-        c = this.value
+      let Lsit = []
+      if (this.value.length != 0) {
+        this.value.forEach(item => {
+          Lsit.push(item[2])
+        })
       }
-
       this.tableCopeTableList = filter(
         this.risk,
-        b,
-        c,
+        this.b,
+        this.c,
         this.search,
         this.value2,
         this.search2,
+        Lsit,
         this.res
       )
       this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
@@ -520,26 +556,36 @@ export default {
       } else {
         this.search2 = this.search2.filter(item => item != '全部')
       }
+      if (this.search[this.search.length - 1] == '全部' || this.search.length == 0) {
+        this.search = ['全部']
+      } else {
+        this.search = this.search.filter(item => item != '全部')
+      }
       this.$store.commit("SearchChange", this.search2)
       this.into()
     }
   },
   created () {
+    this.$store.state.res.forEach(item => {
+      if (this.setOption3.indexOf(item.公司) == -1) {
+        this.setOption3.push(item.公司)
+      }
+    })
 
     this.res = this.$store.state.res
     if (this.$route.params.a) {
       this.formInline.region = [this.$route.params.a]
     }
     if (this.$route.params.GSname) {
-      this.search = this.$route.params.GSname
+      this.search = [this.$route.params.GSname]
     }
     if (this.$route.params.type) {
       this.search2 = [this.$route.params.type]
     }
     if (this.$route.params.name) {
-      this.value = [0, this.$route.params.name]
+      this.b = this.$route.params.name
     } else if (this.$route.params.b) {
-      this.value = this.$route.params.b
+      this.c = this.$route.params.b
     }
     if (this.date == 2592000) {
       this.value2 = [this.$store.state.nowDate - 30 * 86400000, this.$store.state.nowDate]
@@ -547,11 +593,11 @@ export default {
       this.value2 = [this.$store.state.nowDate - 7 * 86400000, this.$store.state.nowDate]
     }
     this.into()
-
+    this.b = ''
+    this.c = ''
 
   },
   beforeMount () {
-
     this.tableData = this.currentChangePage(this.pageSize, this.currentPage)
   },
   mounted () {
