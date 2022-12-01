@@ -62,14 +62,14 @@
             <div class="name">
               <div class="link">
                 <el-link type="primary" :underline="false">{{
-                  scope.row["企业名称"]
+                  scope.row["K02_企业"]
                 }}</el-link>
                 <el-tag
                   :effect="scope.row['K11_高风险'] == 0 ? null : 'dark'"
                   size="mini"
                   type="danger"
                   @click="
-                    jump(scope.row['企业名称'], scope.row['K01_分组'], '高风险')
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '高风险')
                   "
                   >高风险:{{ scope.row["K11_高风险"] }}</el-tag
                 >
@@ -78,7 +78,7 @@
                   size="mini"
                   type="warning"
                   @click="
-                    jump(scope.row['企业名称'], scope.row['K01_分组'], '警示')
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '警示')
                   "
                   >警示:{{ scope.row["K12_警示"] }}</el-tag
                 >
@@ -87,7 +87,7 @@
                   size="mini"
                   type="success"
                   @click="
-                    jump(scope.row['企业名称'], scope.row['K01_分组'], '利好')
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '利好')
                   "
                   >利好:{{ scope.row["K13_利好"] }}</el-tag
                 >
@@ -95,7 +95,7 @@
                   :effect="scope.row['K14_提示'] == 0 ? null : 'dark'"
                   size="mini"
                   @click="
-                    jump(scope.row['企业名称'], scope.row['K01_分组'], '提示')
+                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
                   "
                   >提示:{{ scope.row["K14_提示"] }}</el-tag
                 >
@@ -105,7 +105,7 @@
                   type="warning"
                   @click="
                     jump(
-                      scope.row['企业名称'],
+                      scope.row['K02_企业'],
                       scope.row['K01_分组'],
                       null,
                       '司法风险'
@@ -119,7 +119,7 @@
                   type="warning"
                   @click="
                     jump(
-                      scope.row['企业名称'],
+                      scope.row['K02_企业'],
                       scope.row['K01_分组'],
                       null,
                       '工商风险'
@@ -133,7 +133,7 @@
                   type="warning"
                   @click="
                     jump(
-                      scope.row['企业名称'],
+                      scope.row['K02_企业'],
                       scope.row['K01_分组'],
                       null,
                       '经营风险'
@@ -146,7 +146,7 @@
                   size="mini"
                   @click="
                     jump(
-                      scope.row['企业名称'],
+                      scope.row['K02_企业'],
                       scope.row['K01_分组'],
                       null,
                       '经营状况'
@@ -158,7 +158,7 @@
               <el-link
                 type="warning"
                 :underline="false"
-                @click="jump(scope.row['企业名称'], scope.row['K01_分组'])"
+                @click="jump(scope.row['K02_企业'], scope.row['K01_分组'])"
                 >查看历史监测动态></el-link
               >
             </div>
@@ -203,7 +203,7 @@ export default {
       currentPage: 1,
       search2: '',
       search: '',
-      res: this.$store.state.sumList,
+      res: this.$store.state.sumList['last_month'],
       setOption2: [],
       setOption: ['全部'],
       sum: this.$store.state.sum
@@ -246,7 +246,7 @@ export default {
           b = this.setOption2.find(a => a == item.K01_分组)
         }
         if (this.search.indexOf('全部') == -1) {
-          a = this.search.find(a => a == item.企业名称
+          a = this.search.find(a => a == item.K02_企业
           )
         }
 
@@ -277,6 +277,7 @@ export default {
     },
   },
   created () {
+    console.log(this.res)
     this.sum = this.sum.sort((a, b) => b[1] - a[1])
     // this.res = res.filter(item => {
     //   return this.$store.state.ECres.some(a => a.group === item.K01_分组)
@@ -285,9 +286,10 @@ export default {
 
     this.tableData = this.res
     this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
+
     this.res.forEach(item => {
-      if (this.setOption.indexOf(item.企业名称) == -1) {
-        this.setOption.push(item.企业名称)
+      if (this.setOption.indexOf(item.K02_企业) == -1) {
+        this.setOption.push(item.K02_企业)
       }
     })
   }

@@ -311,7 +311,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669629600000 - 3600 * 1000 * 24 * 7)
+            start.setTime(1669737600000 - 3600 * 1000 * 24 * 7)
 
             picker.$emit('pick', [start, end])
           }
@@ -320,7 +320,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669629600000 - 3600 * 1000 * 24 * 30)
+            start.setTime(1669737600000 - 3600 * 1000 * 24 * 30)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -412,9 +412,7 @@ export default {
             value: "经营状况",
             children: [
               // { label: "全部", value: "经营状况" },
-              { label: "投融资动态", value: "投融资动态" },
-              { label: "对外投资", value: "对外投资" },
-              { label: "融资动态", value: "融资动态" },
+             
               { label: "招投标", value: "招投标" },
               { label: "债券信息", value: "债券信息" },
               { label: "购地信息", value: "购地信息" },

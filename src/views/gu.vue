@@ -1,31 +1,77 @@
 <template>
-  <div id="main" style="width: 90vw; height: 100vh"></div>
+  <div>
+    穿透层级：
+    <el-button @click="btnClick(2)">2</el-button>
+    <el-button @click="btnClick(3)">3</el-button>
+    <el-button @click="btnClick(4)">4</el-button>
+    <!-- <el-button @click="btnClick(5)">5</el-button> -->
+    <div id="main" style="width: 90vw; height: 100vh"></div>
+  </div>
 </template>
 
 <script>
 import * as echarts from "echarts"
-import downList from '../../public/jsonData/pass_20221124/s_pass_down.json'
+import typeList from '../../public/jsonData/pass_20221124/s_pass_down.json'
+import upList from '../../public/jsonData/pass_20221124/s_pass_up.json'
 export default {
   data () {
     return {
       down: [],
-      downList,
+      downList: null,
+      upList,
+      typeList,
+      chartDom: '',
+      myChart: '',
       Color: ['#5470c6',
         '#91cc75',
         '#fac858',
         '#ee6666',
         '#73c0de',
         '#3ba272',
-      ]
+      ],
+      level: 4
     }
   },
   methods: {
+    into () {
+      this.down = []
+      this.downList.forEach(item => {
+        if (item['K02_穿透层级'] < this.level) {
+          let obj = {}
+          obj.itemStyle = {}
+          obj.itemStyle.color = this.Color[item['K02_穿透层级']]
+          obj.itemStyle.borderColor = this.Color[item['K02_穿透层级']]
+          obj.name = item.source
+          this.down.push(obj)
+        }
+      })
+      this.downList.forEach(item => {
+        if (item['K02_穿透层级'] < this.level) {
+          let obj = {}
+          obj.itemStyle = {}
+          obj.itemStyle.color = this.Color[item['K02_穿透层级']]
+          obj.itemStyle.borderColor = this.Color[item['K02_穿透层级']]
+          obj.name = item.target
+          this.down.push(obj)
+        }
+      })
+
+      let formatArr = () => {
+        let map = new Map()
+        for (let item of this.down) {
+          if (!map.has(item.name)) {
+            map.set(item.name, item)
+          }
+        }
+        return [...map.values()]
+      }
+      this.down = formatArr()
+
+    },
     show () {
-      var chartDom = document.getElementById("main")
-      var myChart = echarts.init(chartDom, "dark")
+
       var option
       let open = true
-      let sum = 10
       var data = {
         nodes: this.down,
         links: this.downList
@@ -186,28 +232,27 @@ export default {
       const newLinks = limkMap(links)
 
       const newNoods = nodeMap()
-
-
+      let fontSize = this.level == 4 ? 10 : 12
 
       option = {
+        dataZoom: { // 放大和缩放
+          type: 'inside'
+        },
         backgroundColor: "#eee",
         title: {
           subtext: "股权穿透图测试版",
           left: "center"
         },
+
         series: [
           {
             type: "sankey",
-
-            left: 50.0,
-            top: 20.0,
-            right: 150.0,
-            bottom: 25.0,
+            layoutIterations: 10000,
             data: [...newNoods, ...nodessss],
             links: [...newLinks, ...newLinkkkk],
             lineStyle: {
               color: "source",
-              curveness: 0.4
+              curveness: 0.6
             },
             // emphasis: {
             //   focus: "adjacency"
@@ -220,50 +265,71 @@ export default {
               // align: "center",
               color: "rgba(0,0,0,1)",
               fontFamily: "Arial",
-              fontSize: 12
+              fontSize
             }
           }
         ],
         tooltip: {
           trigger: "item",
           padding: 15,
+          confine: true,
           renderMode: 'html',
           formatter (params) {
-            console.log(params)
+            let downList = []
+            let upList = []
+            data.links.forEach(item => {
+              if (item.target == params.name) {
+                downList.push(item)
+              }
+              if (item.source == params.name) {
+                upList.push(item)
+              }
+            })
             //自定义模板
             let res
             if (params.dataType == 'node') {
-              res = `<div>资产构成</div>
+              res = `<div>资产构成</div>`
+              for (let i = 0; i < downList.length; i++) {
+                let value = +downList[i].value2
+                value = value.toFixed(2)
+                res += ` <div>
                         <span style="display:inline-block;margin-right:4px;
 						border-radius:10px;width:10px;height:10px;
 						background-color:#91cc75;"></span>
-                        <span style="margin-right:10%;">${params.name} 投资金额:1770万 占比:70%</span>  
-                        <br/>     
-                         <span style="display:inline-block;margin-right:4px;
+                        <span style="margin-right:10%;">${downList[i].source} 投资金额:${downList[i].K08_投资金额} 占比:${value}%</span>       
+                       </div>`
+              }
+              res += `<div>旗下投资</div>`
+              for (let i = 0; i < upList.length; i++) {
+                let value = +upList[i].value2
+                value = value.toFixed(2)
+                res += ` <div>
+                        <span style="display:inline-block;margin-right:4px;
 						border-radius:10px;width:10px;height:10px;
 						background-color:red;"></span>
-                        <span style="margin-right:10%;">广东横琴海联科技投资有限公司 投资金额:177万 占比:20%</span>  
-                        <br/>   
-                         <span style="display:inline-block;margin-right:4px;
-						border-radius:10px;width:10px;height:10px;
-						background-color:red;"></span>
-                        <span style="margin-right:10%;">柳州市海联金汇汽车零部件有限公司 投资金额:77万 占比:10%</span>  
-                        <br/>    
-                        `
+                        <span style="margin-right:10%;">${upList[i].target} 投资金额:${upList[i].K08_投资金额} 占比:${value}%</span>       
+                       </div>`
+              }
             }
             else {
-              let value = +params.value
+
+              let value
+              data.links.forEach(item => {
+                if (item.source == params.data.source && item.target == params.data.target) {
+                  value = +item.value2
+                }
+              })
               value = value.toFixed(2)
               res = `${params.name}        投资占比:${value}% `
             }
-
             return res
             //返回自定义内容
           }
         }
       }
-      option && myChart.setOption(option)
-      myChart.on('click', (e) => {
+      this.myChart.clear()
+      option && this.myChart.setOption(option)
+      this.myChart.on('click', (e) => {
         if (open) {
           open = !open
           const name = e.data.name || e.data.target
@@ -297,18 +363,18 @@ export default {
 
           // console.log(newLinkkkk, newLiks2, 'qqq');
           const newNood222s = nodeMap()
-          const options = myChart.getOption()
+          const options = this.myChart.getOption()
           options.series[0].data = [...newNood222s, ...nodessss]
           options.series[0].links = [...newLinkkkk, ...newLiks2]
-          myChart.setOption(options)
+          this.myChart.setOption(options)
 
         } else {
           open = !open
-          const options = myChart.getOption()
+          const options = this.myChart.getOption()
           opacity = false
           options.series[0].data = [...newNoods, ...no]
           options.series[0].links = [...newLinks, ...ll]
-          myChart.setOption(options)
+          this.myChart.setOption(options)
         }
       })
 
@@ -333,34 +399,28 @@ export default {
             next(item.next)
           })
       }
+    },
+    btnClick (a) {
+      this.level = a
+      console.log(a)
+      this.into()
+      this.show()
     }
   },
   mounted () {
+    this.chartDom = document.getElementById("main")
+    this.myChart = echarts.init(this.chartDom, "dark")
     this.show()
   },
   created () {
+    this.downList = this.typeList
     this.downList.forEach(item => {
-      let obj = {}
-      obj.itemStyle = {}
-      obj.itemStyle.color = this.Color[item['K02_穿透层级']]
-      obj.itemStyle.borderColor = this.Color[item['K02_穿透层级']]
-      obj.name = item.source
-      this.down.push(obj)
+      item.value2 = item.value
+      item.value = 10
     })
-    let formatArr = () => {
-      let map = new Map()
-      for (let item of this.down) {
-        if (!map.has(item.name)) {
-          map.set(item.name, item)
-        }
-      }
-      return [...map.values()]
-    }
-
-    this.down = formatArr()
-
-
+    this.into()
   }
+
 };
 </script>
 
