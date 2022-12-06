@@ -207,9 +207,11 @@
         </el-table-column>
         <el-table-column label="动态详情" min-width="250" header-align="center">
           <template slot-scope="scope">
-            <span ref="bei">{{ bei(scope.row.备注) }}</span>
+            <span ref="bei">{{ bei(scope.row) }}</span>
             <el-link
-              v-if="scope.row.备注.length > codeLength"
+              v-if="
+                scope.row.备注.length > codeLength && scope.row.类型 == '招投标'
+              "
               @click="open(scope.row.备注)"
               type="primary"
               >详情</el-link
@@ -311,7 +313,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669737600000 - 3600 * 1000 * 24 * 7)
+            start.setTime(1669953617000 - 3600 * 1000 * 24 * 7)
 
             picker.$emit('pick', [start, end])
           }
@@ -320,7 +322,7 @@ export default {
           onClick (picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(1669737600000 - 3600 * 1000 * 24 * 30)
+            start.setTime(1669953617000 - 3600 * 1000 * 24 * 30)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -412,7 +414,7 @@ export default {
             value: "经营状况",
             children: [
               // { label: "全部", value: "经营状况" },
-             
+
               { label: "招投标", value: "招投标" },
               { label: "债券信息", value: "债券信息" },
               { label: "购地信息", value: "购地信息" },
@@ -463,10 +465,14 @@ export default {
       this.into()
     },
     bei (a) {
-      if (a.length > this.codeLength) {
-        this.showBei = true
-        return a.substr(0, this.codeLength) + '...'
-      } return a
+      if (a.类型 == "招投标") {
+        if (a.备注.length > this.codeLength) {
+          this.showBei = true
+          return a.备注.substr(0, this.codeLength) + '...'
+        }
+        return a.备注
+      }
+      return a.备注
     },
     handleClose () {
       this.dialogVisible = false

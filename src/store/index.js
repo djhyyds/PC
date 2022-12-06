@@ -3,13 +3,13 @@ import Vuex from 'vuex'
 // import res from "../../public/jsonData/thData/web_info_投后-ALL.json"
 // import ECres from '../../public/jsonData/thData/web_data_投后-ALL.json'
 // import sum from '../../public/jsonData/thData/list_投后-ALL_add.json'
-// import sumList from '../../public/jsonData/thData/list_投后-ALL_one.json'
+// import sumList from '../../public/jsonData/thData/list_投后-ALL_one_add.json'
 
 
 // import res from "../../public/jsonData/cgData/web_info_采购-ALL.json"
 // import ECres from '../../public/jsonData/cgData/web_data_采购-ALL.json'
 // import sum from '../../public/jsonData/cgData/list_采购-ALL_add.json'
-// import sumList from '../../public/jsonData/cgData/list_采购-ALL_one.json'
+// import sumList from '../../public/jsonData/cgData/list_采购-ALL_one_add.json'
 
 
 // import res from "../../public/jsonData/rfData/web_info_人法动态.json"
@@ -47,7 +47,7 @@ export default new Vuex.Store({
     show: true,
     setOption: [],
     search: ['全部'],
-    nowDate: 1669737600000,
+    nowDate: 1669953617000,
     sum
   },
 

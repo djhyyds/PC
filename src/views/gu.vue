@@ -11,6 +11,7 @@
 
 <script>
 import * as echarts from "echarts"
+import 'zrender/lib/svg/svg'
 import typeList from '../../public/jsonData/pass_20221124/s_pass_down.json'
 import upList from '../../public/jsonData/pass_20221124/s_pass_up.json'
 export default {
@@ -41,6 +42,7 @@ export default {
           obj.itemStyle = {}
           obj.itemStyle.color = this.Color[item['K02_穿透层级']]
           obj.itemStyle.borderColor = this.Color[item['K02_穿透层级']]
+          obj.id = item.source
           obj.name = item.source
           this.down.push(obj)
         }
@@ -51,6 +53,7 @@ export default {
           obj.itemStyle = {}
           obj.itemStyle.color = this.Color[item['K02_穿透层级']]
           obj.itemStyle.borderColor = this.Color[item['K02_穿透层级']]
+          obj.id = item.target
           obj.name = item.target
           this.down.push(obj)
         }
@@ -329,6 +332,7 @@ export default {
       }
       this.myChart.clear()
       option && this.myChart.setOption(option)
+      console.log(option)
       this.myChart.on('click', (e) => {
         if (open) {
           open = !open
@@ -409,7 +413,7 @@ export default {
   },
   mounted () {
     this.chartDom = document.getElementById("main")
-    this.myChart = echarts.init(this.chartDom, "dark")
+    this.myChart = echarts.init(this.chartDom, "dark", { renderer: 'svg' })
     this.show()
   },
   created () {

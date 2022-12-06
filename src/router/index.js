@@ -40,7 +40,12 @@ const routes = [
       path: "/gu",
       name: 'gu',
       component: () => import('../views/gu.vue')
-    }, {
+    }, 
+    {
+      path: "/gu2",
+      name: 'gu2',
+      component: () => import('../views/gu2.vue')
+    },{
       path: "list",
       name: 'list',
       component: () => import('../views/MonitoringList.vue')
