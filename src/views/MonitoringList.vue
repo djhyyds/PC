@@ -16,7 +16,7 @@
           :label="item"
           :value="item"
         ></el-option>
-      </el-select> -->
+      </el-select>-->
       <div class="btn">
         <button
           :class="setOption2.find((a) => a == item[0]) ? 'active' : ''"
@@ -24,9 +24,7 @@
           size="mini"
           v-for="(item, index) in sum"
           :key="index"
-        >
-          {{ item[0] + "(" + item[1] + ")" }}
-        </button>
+        >{{ item[0] + "(" + item[1] + ")" }}</button>
       </div>
       <el-select
         style="width: 300px; margin-top: 10px"
@@ -38,12 +36,7 @@
         @change="onSearch"
         placeholder="请输入公司名称"
       >
-        <el-option
-          v-for="item in setOption"
-          :key="item"
-          :label="item"
-          :value="item"
-        ></el-option>
+        <el-option v-for="item in setOption" :key="item" :label="item" :value="item"></el-option>
       </el-select>
     </div>
     <div class="content">
@@ -51,59 +44,88 @@
         已监测
         <span class="active">{{ tableData.length }}</span> 家企业
       </div>
-      <el-table
-        :data="tableList"
-        border
-        style="width: 100%; margin-top: 20px"
-        height="700px"
-      >
-        <el-table-column label="企业名称" min-width="170" header-align="center">
+      <el-table :data="tableList" border style="width: 100%; margin-top: 20px">
+        <el-table-column label="企业名称" min-width="150" header-align="center">
           <template slot-scope="scope">
             <div class="name">
               <div class="link">
-                <el-link type="primary" :underline="false">{{
+                <el-link type="primary" :underline="false">
+                  {{
                   scope.row["K02_企业"]
-                }}</el-link>
-                <el-tag
-                  :effect="scope.row['K11_高风险'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="danger"
-                  @click="
+                  }}
+                </el-link>
+              </div>
+              <el-link
+                type="warning"
+                :underline="false"
+                @click="jump(scope.row['K02_企业'], scope.row['K01_分组'])"
+              >查看历史监测动态></el-link>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="全部" align="center" min-width="25">
+          <template slot-scope="scope">
+            <el-tag :effect="scope.row['K10_全部'] == 0 ? null : 'dark'">{{ scope.row["K10_全部"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="高风险" align="center" min-width="25">
+          <template slot-scope="scope">
+            <el-tag
+              :effect="scope.row['K11_高风险'] == 0 ? null : 'dark'"
+              size="mini"
+              type="danger"
+              :style="scope.row['K11_高风险'] == 0 ? null :'cursor: pointer'"
+              @click="scope.row['K11_高风险'] == 0 ? null :
                     jump(scope.row['K02_企业'], scope.row['K01_分组'], '高风险')
                   "
-                  >高风险:{{ scope.row["K11_高风险"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K12_警示'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="warning"
-                  @click="
+            >高风险:{{ scope.row["K11_高风险"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="警示" align="center" min-width="25">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K12_警示'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K12_警示'] == 0 ? null : 'dark'"
+              size="mini"
+              type="warning"
+              @click="scope.row['K12_警示'] == 0 ? null :
                     jump(scope.row['K02_企业'], scope.row['K01_分组'], '警示')
                   "
-                  >警示:{{ scope.row["K12_警示"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K13_利好'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="success"
-                  @click="
+            >警示:{{ scope.row["K12_警示"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="利好" align="center" min-width="25">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K13_利好'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K13_利好'] == 0 ? null : 'dark'"
+              size="mini"
+              type="success"
+              @click="scope.row['K13_利好'] == 0 ? null :
                     jump(scope.row['K02_企业'], scope.row['K01_分组'], '利好')
                   "
-                  >利好:{{ scope.row["K13_利好"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K14_提示'] == 0 ? null : 'dark'"
-                  size="mini"
-                  @click="
-                    jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
+            >利好:{{ scope.row["K13_利好"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="提示" align="center" min-width="25">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K14_提示'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K14_提示'] == 0 ? null : 'dark'"
+              size="mini"
+              @click="scope.row['K14_提示'] == 0 ? null :jump(scope.row['K02_企业'], scope.row['K01_分组'], '提示')
                   "
-                  >提示:{{ scope.row["K14_提示"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K15_司法风险'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="warning"
-                  @click="
+            >提示:{{ scope.row["K14_提示"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="司法风险" align="center" min-width="30">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K15_司法风险'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K15_司法风险'] == 0 ? null : 'dark'"
+              size="mini"
+              type="warning"
+              @click="scope.row['K15_司法风险'] == 0 ? null :
                     jump(
                       scope.row['K02_企业'],
                       scope.row['K01_分组'],
@@ -111,13 +133,17 @@
                       '司法风险'
                     )
                   "
-                  >司法风险:{{ scope.row["K15_司法风险"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K16_工商风险'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="warning"
-                  @click="
+            >司法风险:{{ scope.row["K15_司法风险"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="工商风险" align="center" min-width="30">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K16_工商风险'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K16_工商风险'] == 0 ? null : 'dark'"
+              size="mini"
+              type="warning"
+              @click="scope.row['K16_工商风险'] == 0 ? null :
                     jump(
                       scope.row['K02_企业'],
                       scope.row['K01_分组'],
@@ -125,13 +151,17 @@
                       '工商风险'
                     )
                   "
-                  >工商风险:{{ scope.row["K16_工商风险"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K17_经营风险'] == 0 ? null : 'dark'"
-                  size="mini"
-                  type="warning"
-                  @click="
+            >工商风险:{{ scope.row["K16_工商风险"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="经营风险" align="center" min-width="30">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K17_经营风险'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K17_经营风险'] == 0 ? null : 'dark'"
+              size="mini"
+              type="warning"
+              @click="
                     jump(
                       scope.row['K02_企业'],
                       scope.row['K01_分组'],
@@ -139,12 +169,16 @@
                       '经营风险'
                     )
                   "
-                  >经营风险:{{ scope.row["K17_经营风险"] }}</el-tag
-                >
-                <el-tag
-                  :effect="scope.row['K18_经营状况'] == 0 ? null : 'dark'"
-                  size="mini"
-                  @click="
+            >经营风险:{{ scope.row["K17_经营风险"] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="经营状况" align="center" min-width="30">
+          <template slot-scope="scope">
+            <el-tag
+            :style="scope.row['K18_经营状况'] == 0 ? null :'cursor: pointer'"
+              :effect="scope.row['K18_经营状况'] == 0 ? null : 'dark'"
+              size="mini"
+              @click="scope.row['K18_经营状况'] == 0 ? null :
                     jump(
                       scope.row['K02_企业'],
                       scope.row['K01_分组'],
@@ -152,31 +186,19 @@
                       '经营状况'
                     )
                   "
-                  >经营状况:{{ scope.row["K18_经营状况"] }}</el-tag
-                >
-              </div>
-              <el-link
-                type="warning"
-                :underline="false"
-                @click="jump(scope.row['K02_企业'], scope.row['K01_分组'])"
-                >查看历史监测动态></el-link
-              >
-            </div>
+            >经营状况:{{ scope.row["K18_经营状况"] }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="K03_监测开始日期"
-          label="监测时间"
-          min-width="30"
-          align="center"
-        ></el-table-column>
-        <el-table-column label="监测分组" min-width="40" align="center"
-          ><template slot-scope="scope">
-            <span class="type" @click="jump(null, scope.row['K01_分组'])">{{
+        <el-table-column prop="K03_监测开始日期" label="监测时间" min-width="35" align="center"></el-table-column>
+        <el-table-column label="监测分组" min-width="40" align="center">
+          <template slot-scope="scope">
+            <span class="type" @click="jump(null, scope.row['K01_分组'])">
+              {{
               scope.row["K01_分组"]
-            }}</span>
-          </template></el-table-column
-        >
+              }}
+            </span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <el-pagination
@@ -192,108 +214,117 @@
 </template>
 
 <script>
-
-
 export default {
-  data () {
+  data() {
     return {
       tableData: [],
       tableList: [],
       pageSize: 14,
       currentPage: 1,
-      search2: '',
-      search: '',
-      res: this.$store.state.sumList['last_month'],
+      search2: "",
+      search: "",
+      res: this.$store.state.sumList["last_month"],
       setOption2: [],
-      setOption: ['全部'],
-      sum: this.$store.state.sum
-    }
+      setOption: ["全部"],
+      sum: this.$store.state.sum,
+      ff: -1
+    };
   },
   methods: {
-    jump (a, b, c, d) {
+    btnSort(a) {
+      console.log(111);
+      this.ff = this.ff * -1;
+      this.tableData = this.tableData.sort((c, b) => (c[a] - b[a]) * this.ff);
+      this.currentPage = 1;
+      this.tableList = this.currentChangePage(this.pageSize, this.currentPage);
+    },
+    jump(a, b, c, d) {
       this.$router.push({
-        name: 'details', params: {
+        name: "details",
+        params: {
           GSname: a,
           type: b,
           a: c,
           b: d
         }
-      })
-
-
+      });
     },
-    btnClick (a) {
-      if (a[0] == 'ALL') {
-        this.setOption2 = ['ALL']
+    btnClick(a) {
+      if (a[0] == "ALL") {
+        this.setOption2 = ["ALL"];
       } else {
-        this.setOption2 = this.setOption2.filter(item => item != 'ALL')
-        if (this.setOption2.indexOf(a[0]) != -1) { this.setOption2 = this.setOption2.filter(item => item != a[0]) } else {
-          this.setOption2.push(a[0])
+        this.setOption2 = this.setOption2.filter(item => item != "ALL");
+        if (this.setOption2.indexOf(a[0]) != -1) {
+          this.setOption2 = this.setOption2.filter(item => item != a[0]);
+        } else {
+          this.setOption2.push(a[0]);
         }
       }
-      this.onSearch()
+      this.onSearch();
     },
-    onSearch () {
-      if (this.search[this.search.length - 1] == '全部' || this.search.length == 0) {
-        this.search = ['全部']
+    onSearch() {
+      if (
+        this.search[this.search.length - 1] == "全部" ||
+        this.search.length == 0
+      ) {
+        this.search = ["全部"];
       } else {
-        this.search = this.search.filter(item => item != '全部')
+        this.search = this.search.filter(item => item != "全部");
       }
-      this.tableData = this.res
+      this.tableData = this.res;
       this.tableData = this.tableData.filter(item => {
-        let a = true, b = true
-        if (this.setOption2.length != 0 && this.setOption2.indexOf('ALL') == -1) {
-          b = this.setOption2.find(a => a == item.K01_分组)
+        let a = true,
+          b = true;
+        if (
+          this.setOption2.length != 0 &&
+          this.setOption2.indexOf("ALL") == -1
+        ) {
+          b = this.setOption2.find(a => a == item.K01_分组);
         }
-        if (this.search.indexOf('全部') == -1) {
-          a = this.search.find(a => a == item.K02_企业
-          )
+        if (this.search.indexOf("全部") == -1) {
+          a = this.search.find(a => a == item.K02_企业);
         }
 
-        return a && b
-      })
+        return a && b;
+      });
 
-
-      this.currentPage = 1
-      this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
+      this.currentPage = 1;
+      this.tableList = this.currentChangePage(this.pageSize, this.currentPage);
     },
-    handleSizeChange (pageSize) {
-      this.pageSize = pageSize
-      this.tableList = this.currentChangePage(pageSize, this.currentPage)
+    handleSizeChange(pageSize) {
+      this.pageSize = pageSize;
+      this.tableList = this.currentChangePage(pageSize, this.currentPage);
     },
-    handleCurrentChange (currentPage) {
-      this.currentPage = currentPage
-      this.tableList = this.currentChangePage(this.pageSize, currentPage)
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage;
+      this.tableList = this.currentChangePage(this.pageSize, currentPage);
     },
     //分页方法
-    currentChangePage (size, current) {
-      const tablePush = []
+    currentChangePage(size, current) {
+      const tablePush = [];
       this.tableData.forEach((item, index) => {
         if (size * (current - 1) <= index && index <= size * current - 1) {
-          tablePush.push(item)
+          tablePush.push(item);
         }
-      })
-      return tablePush
-    },
+      });
+      return tablePush;
+    }
   },
-  created () {
-    console.log(this.res)
-    this.sum = this.sum.sort((a, b) => b[1] - a[1])
+  created() {
+    this.sum = this.sum.sort((a, b) => b[1] - a[1]);
     // this.res = res.filter(item => {
     //   return this.$store.state.ECres.some(a => a.group === item.K01_分组)
     // })
-
-
-    this.tableData = this.res
-    this.tableList = this.currentChangePage(this.pageSize, this.currentPage)
+    this.tableData = this.res;
+    this.tableList = this.currentChangePage(this.pageSize, this.currentPage);
 
     this.res.forEach(item => {
       if (this.setOption.indexOf(item.K02_企业) == -1) {
-        this.setOption.push(item.K02_企业)
+        this.setOption.push(item.K02_企业);
       }
-    })
+    });
   }
-}
+};
 </script>
 
 <style lang='less' scoped>
@@ -344,10 +375,10 @@ export default {
   display: flex;
   align-content: center;
   justify-content: space-between;
-  .el-tag {
-    cursor: pointer;
-    margin-right: 2px;
-  }
+}
+.el-tag {
+ 
+  margin-right: 2px;
 }
 .content {
   .title {

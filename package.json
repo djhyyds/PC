@@ -17,6 +17,7 @@
     "less-loader": "^11.1.0",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
+    "mongodb": "^4.12.1",
     "multi-cascader": "^1.1.0",
     "relation-graph": "^1.1.0",
     "sass": "^1.56.1",

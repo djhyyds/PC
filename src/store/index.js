@@ -24,6 +24,11 @@ import Vuex from 'vuex'
 // import sum from '../../public/jsonData/skData/list_数科-教育场景_add.json'
 // import sumList from '../../public/jsonData/skData/list_数科-教育场景_one_add.json'
 
+// import res from "../../public/jsonData/gylData/web_info_供应链管理.json"
+// import ECres from '../../public/jsonData/gylData/web_data_供应链管理.json'
+// import sum from '../../public/jsonData/gylData/list_供应链管理_add.json'
+// import sumList from '../../public/jsonData/gylData/list_供应链管理_one_add.json'
+
 
 import res from "../../public/jsonData/allData/web_info_all.json"
 import ECres from '../../public/jsonData/allData/web_data_all.json'
@@ -37,6 +42,7 @@ Vue.use(Vuex)
 // const VuexLocal = new VuexPersistence({
 //   storage: window.localStorage
 // })
+let nowDate = res[0].时间戳 * 1000
 export default new Vuex.Store({
   state: {
     res,
@@ -47,20 +53,20 @@ export default new Vuex.Store({
     show: true,
     setOption: [],
     search: ['全部'],
-    nowDate: 1669953617000,
+    nowDate,
     sum
   },
 
   getters: {
   },
   mutations: {
-    DateChange (state, a) {
+    DateChange(state, a) {
       state.date = a
     },
-    SearchChange (state, a) {
+    SearchChange(state, a) {
       state.search = a
     },
-    showChange (state, a) {
+    showChange(state, a) {
       state.show = true
       state.setOption = a
     }

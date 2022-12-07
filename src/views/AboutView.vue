@@ -13,27 +13,16 @@
         @change="onSearch"
         placeholder="请选择分组"
       >
-        <el-option
-          v-for="item in setOption2"
-          :key="item"
-          :label="item"
-          :value="item"
-        ></el-option>
+        <el-option v-for="item in setOption2" :key="item" :label="item" :value="item"></el-option>
       </el-select>
       <div v-else></div>
       <div>
         动态时间：
         <!-- <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
           >今天</span
-        > -->
-        <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''"
-          >近7天</span
-        >
-        <span
-          @click="DateTime(2592000)"
-          :class="date == 2592000 ? 'active' : ''"
-          >近30天</span
-        >
+        >-->
+        <span @click="DateTime(604800)" :class="date == 604800 ? 'active' : ''">近7天</span>
+        <span @click="DateTime(2592000)" :class="date == 2592000 ? 'active' : ''">近30天</span>
       </div>
     </div>
     <div class="action">
@@ -84,8 +73,8 @@ export default {
       search: "",
       date: "",
       input: "",
-      setOption2: ['全部'],
-      search2: '',
+      setOption2: ["全部"],
+      search2: "",
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
       res2: this.$store.state.res,
       res: [],
@@ -95,53 +84,58 @@ export default {
       myChart3: "",
       myChart4: "",
       ECres: this.$store.state.ECres
-    }
+    };
   },
   methods: {
-    onSearch () {
-      if (this.search2[this.search2.length - 1] == '全部' || this.search2.length == 0) {
-        this.search2 = ['全部']
+    onSearch() {
+      if (
+        this.search2[this.search2.length - 1] == "全部" ||
+        this.search2.length == 0
+      ) {
+        this.search2 = ["全部"];
       } else {
-        this.search2 = this.search2.filter(item => item != '全部')
+        this.search2 = this.search2.filter(item => item != "全部");
       }
 
-      this.$store.commit("SearchChange", this.search2)
-      this.into()
+      this.$store.commit("SearchChange", this.search2);
+      this.into();
     },
-    into () {
-      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 }
+    into() {
+      this.result = { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 };
 
-      this.res = this.res2.filter(
-        item => {
-          if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
-            return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date && this.search2.find(a => a == item.分组)
-
-          } else {
-            return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date
-          }
-
+      this.res = this.res2.filter(item => {
+        if (this.search2.length != 0 && this.search2.indexOf("全部") == -1) {
+          return (
+            this.$store.state.nowDate / 1000 - item.时间戳 <= this.date &&
+            this.search2.find(a => a == item.分组)
+          );
+        } else {
+          return this.$store.state.nowDate / 1000 - item.时间戳 <= this.date;
         }
-      )
+      });
       this.res.forEach(item => {
         if (this.result[item["等级"]]) {
           this.result[item["等级"]]++;
         } else {
           this.result[item["等级"]] = 1;
         }
-      })
+      });
       if (this.res.length == 0) {
-        this.res.length = 1
+        this.res.length = 1;
       }
-      this.show5()
-      this.show1()
-      this.show2()
-      this.show3()
-      this.show4()
+      console.log(this.setOption2);
+      this.show5();
+      this.show1();
+      this.show2();
+      this.show3();
+      this.show4();
+
+
     },
-    DateTime (a) {
-      this.$store.commit("DateChange", a)
-      this.date = this.$store.state.date
-      this.into()
+    DateTime(a) {
+      this.$store.commit("DateChange", a);
+      this.date = this.$store.state.date;
+      this.into();
     },
     filter(a) {
       this.$router.push({
@@ -152,8 +146,8 @@ export default {
         }
       });
     },
-    show5 () {
-      let option
+    show5() {
+      let option;
       let gaugeData = [
         {
           value: ((this.result["高风险"] / this.res.length) * 100).toFixed(2),
@@ -210,8 +204,8 @@ export default {
       };
       option && this.myChart.setOption(option, true);
     },
-    show1 () {
-      let option
+    show1() {
+      let option;
 
       let gaugeData = [
         {
@@ -269,8 +263,8 @@ export default {
       };
       option && this.myChart1.setOption(option, true);
     },
-    show2 () {
-      let option
+    show2() {
+      let option;
       let gaugeData = [
         {
           value: ((this.result["提示"] / this.res.length) * 100).toFixed(2),
@@ -327,8 +321,8 @@ export default {
       };
       option && this.myChart2.setOption(option, true);
     },
-    show3 () {
-      let option
+    show3() {
+      let option;
       let gaugeData = [
         {
           value: ((this.result["利好"] / this.res.length) * 100).toFixed(2),
@@ -387,61 +381,74 @@ export default {
       };
       option && this.myChart3.setOption(option);
     },
-    show4 () {
-      var option
-      let a, b = true
-      a = this.date == 604800 ? 7 : 30
-      let s = []
+    show4() {
+      var option;
+      let a,
+        b = true;
+      a = this.date == 604800 ? 7 : 30;
+      let s = [];
       if (this.search2.length) {
         this.search2.forEach(item2 => {
-          let r = this.ECres.find(
-            item => {
-              if (this.search2.length != 0 && this.search2.indexOf('全部') == -1) {
-                b = item.group === item2
+          let r = this.ECres.find(item => {
+            if (
+              this.search2.length != 0 &&
+              this.search2.indexOf("全部") == -1
+            ) {
+              b = item.group === item2;
+            } else {
+              if (item.group == "all") {
+                b = item.group == "all";
+              } else if (
+                item.group.substr(
+                  item.group.length - 3,
+                  item.group.length - 1
+                ) === "all"
+              ) {
+                b =
+                  item.group.substr(
+                    item.group.length - 3,
+                    item.group.length - 1
+                  ) === "all";
               } else {
-                if (item.group == 'all') { b = item.group == 'all' }
-                else if (item.group.substr(item.group.length - 3, item.group.length - 1) === 'all') {
-                  b = item.group.substr(item.group.length - 3, item.group.length - 1) === 'all'
-                } else {
-                  b = item.group.substr(0, 2) === '人法' || item.group.substr(0, 2) === '数科'
-                }
+                b =
+                  item.group.substr(0, 2) === "人法" ||
+                  item.group.substr(0, 2) === "数科";
               }
-              return item['source_' + a] && b
             }
-          )
-          s.push(r)
-       
-        })
+            return item["source_" + a] && b;
+          });
+          s.push(r);
+        });
       }
 
-      let aaa = null
+      let aaa = null;
       if (s.length == 1) {
-        aaa = s[0]
+        aaa = s[0];
       } else {
-        let ts = [[], [], [], [], []]
+        let ts = [[], [], [], [], []];
         s.forEach(item => {
-          ts[0] = item['source_' + a][0]
-          ts[1].push(item['source_' + a][1])
-          ts[2].push(item['source_' + a][2])
-          ts[3].push(item['source_' + a][3])
-          ts[4].push(item['source_' + a][4])
-        })
+          ts[0] = item["source_" + a][0];
+          ts[1].push(item["source_" + a][1]);
+          ts[2].push(item["source_" + a][2]);
+          ts[3].push(item["source_" + a][3]);
+          ts[4].push(item["source_" + a][4]);
+        });
         ts.forEach((item, index) => {
           if (index > 0) {
             ts[index] = item.reduce((prev, cur) => {
               cur.forEach((item, index) => {
-                if (typeof prev[index] === 'number') {
-                  prev[index] += item
+                if (typeof prev[index] === "number") {
+                  prev[index] += item;
                 } else {
-                  prev[index] = item
+                  prev[index] = item;
                 }
-              })
-              return prev
-            }, [])
+              });
+              return prev;
+            }, []);
           }
-        })
-        aaa = {}
-        aaa['source_' + a] = ts
+        });
+        aaa = {};
+        aaa["source_" + a] = ts;
       }
 
       option = {
@@ -450,7 +457,7 @@ export default {
           trigger: "axis"
         },
         dataset: {
-          source: aaa['source_' + a]
+          source: aaa["source_" + a]
         },
         xAxis: { type: "category", boundaryGap: false },
         yAxis: { gridIndex: 0 },
@@ -461,20 +468,19 @@ export default {
             smooth: true,
             seriesLayoutBy: "row",
             // symbol: "none",
-            symbolSize: 5,//一定要加这个字段才能显示
+            symbolSize: 5, //一定要加这个字段才能显示
             itemStyle: {
               normal: {
                 label: {
                   show: true,
-                  position: 'top',
+                  position: "top",
                   fontSize: 13,
                   textStyle: {
-                    color: 'auto'
+                    color: "auto"
                   }
                 }
               }
             },
-
 
             emphasis: { focus: "series" }
           },
@@ -484,19 +490,19 @@ export default {
             // symbol: "none",
             seriesLayoutBy: "row",
             emphasis: { focus: "series" },
-            symbolSize: 5,//一定要加这个字段才能显示
+            symbolSize: 5, //一定要加这个字段才能显示
             itemStyle: {
               normal: {
                 label: {
                   show: true,
-                  position: 'top',
+                  position: "top",
                   fontSize: 13,
                   textStyle: {
-                    color: 'auto'
+                    color: "auto"
                   }
                 }
               }
-            },
+            }
           },
           {
             type: "line",
@@ -504,19 +510,19 @@ export default {
             // symbol: "none",
             seriesLayoutBy: "row",
             emphasis: { focus: "series" },
-            symbolSize: 5,//一定要加这个字段才能显示
+            symbolSize: 5, //一定要加这个字段才能显示
             itemStyle: {
               normal: {
                 label: {
                   show: true,
-                  position: 'top',
+                  position: "top",
                   fontSize: 13,
                   textStyle: {
-                    color: 'auto'
+                    color: "auto"
                   }
                 }
               }
-            },
+            }
           },
           {
             type: "line",
@@ -524,22 +530,22 @@ export default {
             // symbol: "none",
             seriesLayoutBy: "row",
             emphasis: { focus: "series" },
-            symbolSize: 5,//一定要加这个字段才能显示
+            symbolSize: 5, //一定要加这个字段才能显示
             itemStyle: {
               normal: {
                 label: {
                   show: true,
-                  position: 'top',
+                  position: "top",
                   fontSize: 13,
                   textStyle: {
-                    color: 'auto'
+                    color: "auto"
                   }
                 }
               }
-            },
+            }
           }
         ]
-      }
+      };
       // this.myChart4.on("updateAxisPointer", function (event) {
       //   const xAxisInfo = event.axesInfo[0]
       //   if (xAxisInfo) {
@@ -559,36 +565,35 @@ export default {
       //   }
       // })
 
-      this.myChart4.setOption(option)
+      this.myChart4.setOption(option);
     }
   },
-  mounted () {
-    let main1 = this.$refs.main1
-    this.myChart1 = echarts.init(main1)
-    let main2 = this.$refs.main2
-    this.myChart2 = echarts.init(main2)
-    let main3 = this.$refs.main3
-    this.myChart3 = echarts.init(main3)
-    let main = this.$refs.main
-    this.myChart = echarts.init(main)
-    let main4 = this.$refs.main4
-    this.myChart4 = echarts.init(main4)
-    this.into()
+  mounted() {
+    let main1 = this.$refs.main1;
+    this.myChart1 = echarts.init(main1);
+    let main2 = this.$refs.main2;
+    this.myChart2 = echarts.init(main2);
+    let main3 = this.$refs.main3;
+    this.myChart3 = echarts.init(main3);
+    let main = this.$refs.main;
+    this.myChart = echarts.init(main);
+    let main4 = this.$refs.main4;
+    this.myChart4 = echarts.init(main4);
+    this.into();
   },
-  created () {
-    this.date = this.$store.state.date
+  created() {
+    this.date = this.$store.state.date;
     this.res2.forEach(item => {
       if (this.setOption2.indexOf(item.分组) == -1) {
-        this.setOption2.push(item.分组)
+        this.setOption2.push(item.分组);
       }
-    })
-    if (this.$store.state.search == '全部') {
-      this.$store.commit("showChange", this.setOption2)
-
+    });
+    if (this.$store.state.search == "全部") {
+      this.$store.commit("showChange", this.setOption2);
     }
 
-    this.setOption2 = this.$store.state.setOption
-    this.search2 = this.$store.state.search
+    this.setOption2 = this.$store.state.setOption;
+    this.search2 = this.$store.state.search;
   }
 };
 </script>
