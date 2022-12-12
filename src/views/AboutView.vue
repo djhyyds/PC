@@ -4,7 +4,6 @@
     <hr />
     <div class="input">
       <el-select
-        v-if="this.$store.state.show"
         v-model="search2"
         multiple
         collapse-tags
@@ -15,7 +14,7 @@
       >
         <el-option v-for="item in setOption2" :key="item" :label="item" :value="item"></el-option>
       </el-select>
-      <div v-else></div>
+
       <div>
         动态时间：
         <!-- <span @click="DateTime(86400)" :class="date == 86400 ? 'active' : ''"
@@ -67,16 +66,17 @@
 
 <script>
 import * as echarts from "echarts";
+
 export default {
   data() {
     return {
       search: "",
       date: "",
       input: "",
-      setOption2: ["全部"],
+      setOption2: [],
       search2: "",
       result: { 高风险: 0, 警示: 0, 提示: 0, 利好: 0 },
-      res2: this.$store.state.res,
+      res2: null,
       res: [],
       myChart: "",
       myChart1: "",
@@ -129,8 +129,6 @@ export default {
       this.show2();
       this.show3();
       this.show4();
-
-
     },
     DateTime(a) {
       this.$store.commit("DateChange", a);
@@ -582,16 +580,8 @@ export default {
     this.into();
   },
   created() {
+    this.res2 = this.$store.state.res;
     this.date = this.$store.state.date;
-    this.res2.forEach(item => {
-      if (this.setOption2.indexOf(item.分组) == -1) {
-        this.setOption2.push(item.分组);
-      }
-    });
-    if (this.$store.state.search == "全部") {
-      this.$store.commit("showChange", this.setOption2);
-    }
-
     this.setOption2 = this.$store.state.setOption;
     this.search2 = this.$store.state.search;
   }

@@ -72,7 +72,7 @@
             <el-option v-for="item in setOption3" :key="item" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="监测分组 :" v-if="this.$store.state.show">
+        <el-form-item label="监测分组 :">
           <el-select
             v-model="search2"
             filterable

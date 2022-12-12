@@ -4,7 +4,6 @@
     <hr />
     <div class="input">
       <el-select
-        v-if="this.$store.state.show"
         v-model="search2"
         multiple
         collapse-tags

@@ -15,9 +15,11 @@
             >监测动态</el-menu-item>
             <el-menu-item index="list" @click="$router.push({ name: 'list' })">监测列表</el-menu-item>
           </el-submenu>
-          <!-- <el-menu-item index="gu" @click="$router.push({ path: 'gu' })">股权穿透</el-menu-item>
-          <el-menu-item index="big" @click="$router.push({ path: '/big' })">数字化大屏</el-menu-item>
-          <el-menu-item index="gu2" @click="$router.push({ path: 'gu2' })">股权穿透2</el-menu-item> -->
+          <template v-if="this.$store.state.show">
+            <el-menu-item index="gu" @click="$router.push({ path: 'gu' })">股权穿透</el-menu-item>
+            <el-menu-item index="big" @click="$router.push({ path: '/big' })">数字化大屏</el-menu-item>
+            <el-menu-item index="gu2" @click="$router.push({ path: 'gu2' })">股权穿透2</el-menu-item>
+          </template>
         </el-menu>
       </el-aside>
       <el-container>
